@@ -1,1 +1,20 @@
 // Here you can add other styles
+// Assets-Table
+.table-bordered {
+	th {
+		border: none;
+	}
+	td {
+		border: none;
+	}
+}
+.table {
+	th {
+		border-top: 1px solid #23282c !important;
+		border-bottom: 1px solid #23282c !important;
+	}
+	td {
+		border-top: 1px solid #23282c !important;
+		border-bottom: 1px solid #23282c !important;
+	}
+}

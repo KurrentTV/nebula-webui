@@ -6,6 +6,9 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
+import { initializeHttpClient } from './utils/Axios-Config';
+
+initializeHttpClient();
 
 ReactDOM.render(<App />, document.getElementById('root'));
 

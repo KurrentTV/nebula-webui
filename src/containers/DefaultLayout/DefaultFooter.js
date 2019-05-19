@@ -16,7 +16,7 @@ class DefaultFooter extends Component {
     return (
       <React.Fragment>
         <span><a href="https://nebulabroadcast.com">Nebula</a> &copy; 2019 Nebula Broadcast.</span>
-        <span className="ml-auto">This GUI is Made with <code><i class="fa fa-heart"></i></code> by <a href="https://kurrent.tv">Kurrent TV</a>.</span>
+        <span className="ml-auto">This GUI is Made with <code><i className="fa fa-heart"></i></code> by <a href="https://kurrent.tv">Kurrent TV</a>.</span>
       </React.Fragment>
     );
   }

@@ -19,7 +19,12 @@ export default {
 
     {
       name: 'Assets',
-      url: '/base',
+      url: '/assets',
+      icon: 'fa fa-database',
+    },
+    {
+      name: 'Copy',
+      url: '/copy',
       icon: 'fa fa-database',
     },
     {
