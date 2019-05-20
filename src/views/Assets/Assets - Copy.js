@@ -22,7 +22,8 @@ class Assets extends Component {
       activeTab: 'Main',
       items: [],
       isLoaded: false,
-      tableItems: false
+      tableItems: false,
+      tableColumns: []
     };
 
     this.MainTable = data.rows;
@@ -36,25 +37,9 @@ class Assets extends Component {
       withFirstAndLast: false,
     };
   }
-  subTitleFormat(cell){  
-  	if(cell === "" || cell == 'undefined' || cell == null) 
-  	return "-";
-  	else return cell;
-  		
-  }
-  formatTime(cell){
-  	var date = new Date(cell*1000);  
-  	var d = date.getDay();
-  	var m = date.getMonth();
-  	var y = date.getFullYear();
-	var hours = date.getHours();
-	var minutes = "0" + date.getMinutes();
-	var seconds = "0" + date.getSeconds();
-	var formattedTime = y + '-' + m + '-' + d + ' ' + hours + ':' + minutes.substr(-2);
-	return formattedTime;
-  }
+
   componentDidMount() {
-    const data = { object_type: 'asset', id_view:1};  
+    const data = { object_type: 'asset', id_view: 1, result=["id","title","idec","id_folder","gener", "mtime@{\"format\": \"%Y-%m-%d\"}","ctime@{\"format\": \"%Y-%m-%d\"}","duration"] }	  
       NebulaApi.getAssets(data).then(res => {      	     	
         this.setState({
           items: res.data,
@@ -63,8 +48,21 @@ class Assets extends Component {
        ).catch( err => {
         console.error(err)
       })
-  }  
-
+  }
+  
+  function _tableData(_data,_options){
+	   return (
+	   	<BootstrapTable data={_data} version="4" striped hover pagination options={_options}>
+            <TableHeaderColumn isKey dataField="title" dataSort>Title</TableHeaderColumn>
+            <TableHeaderColumn dataField="idec" dataSort>IDEC</TableHeaderColumn>
+            <TableHeaderColumn dataField="id_folder" dataSort>Folder</TableHeaderColumn>
+            <TableHeaderColumn dataField="gener" dataSort>Genre</TableHeaderColumn>
+            <TableHeaderColumn dataField="mtime" dataSort>Duration</TableHeaderColumn>
+            <TableHeaderColumn dataField="ctime" dataSort>Created</TableHeaderColumn>
+            <TableHeaderColumn dataField="mtime" dataSort>Modified</TableHeaderColumn>
+          </BootstrapTable>
+	   )
+  }
   
   showOptions = (_showHide) => {
   	this.setState({
@@ -128,7 +126,7 @@ class Assets extends Component {
 
   render() {
   	var {activeTab,items,isLoaded,tableItems} = this.state;  	
-  	let formItems;let _tableData;
+  	let formItems;
   	if(tableItems===true){
   		
   		formItems = (
@@ -142,38 +140,18 @@ class Assets extends Component {
                 />
               </FormGroup>
   		);
-	}	
-	if(isLoaded === true)
-	{
-		_tableData = (
-			<BootstrapTable data={items.data} version="4" striped hover pagination options={this.options}>
-	            <TableHeaderColumn isKey dataField="title" dataSort>Title</TableHeaderColumn>
-	             <TableHeaderColumn dataField="subtitle" dataFormat={ this.subTitleFormat } dataSort>Sub Title</TableHeaderColumn>
-	            <TableHeaderColumn dataField="idec" dataFormat={ this.subTitleFormat } dataSort>IDEC</TableHeaderColumn>
-	            <TableHeaderColumn dataField="id_folder" dataSort>Folder</TableHeaderColumn>
-	            <TableHeaderColumn dataField="gener" dataFormat={ this.subTitleFormat } dataSort>Genre</TableHeaderColumn>
-	            <TableHeaderColumn dataField="duration" dataSort>Duration</TableHeaderColumn>
-	            <TableHeaderColumn dataField="ctime" dataFormat={ this.formatTime } dataSort>Created</TableHeaderColumn>
-	            <TableHeaderColumn dataField="mtime" dataFormat={ this.formatTime } dataSort>Modified</TableHeaderColumn>
-	          </BootstrapTable>
-		);
 	}
-	else
-	{
-		_tableData = (
-			<BootstrapTable data={items.data} version="4" striped hover pagination options={this.options}>
-	            <TableHeaderColumn isKey dataField="title" dataSort>Title</TableHeaderColumn>
-	             <TableHeaderColumn dataField="subtitle" dataFormat={ this.subTitleFormat } dataSort >Sub Title</TableHeaderColumn>
-	            <TableHeaderColumn dataField="idec" dataFormat={ this.subTitleFormat } dataSort>IDEC</TableHeaderColumn>
-	            <TableHeaderColumn dataField="id_folder" dataSort>Folder</TableHeaderColumn>
-	            <TableHeaderColumn dataField="gener" dataFormat={ this.subTitleFormat } dataSort>Genre</TableHeaderColumn>
-	            <TableHeaderColumn dataField="duration" dataSort>Duration</TableHeaderColumn>
-	            <TableHeaderColumn dataFormat={ this.formatTime } dataField="ctime" dataSort>Created</TableHeaderColumn>
-	            <TableHeaderColumn dataField="mtime" dataFormat={ this.formatTime } dataSort>Modified</TableHeaderColumn>
-	          </BootstrapTable>
-		);
-	}
-	
+	_tableData = (
+		<BootstrapTable data={items.data} version="4" striped hover pagination options={this.options}>
+            <TableHeaderColumn isKey dataField="title" dataSort>Title</TableHeaderColumn>
+            <TableHeaderColumn dataField="idec" dataSort>IDEC</TableHeaderColumn>
+            <TableHeaderColumn dataField="id_folder" dataSort>Folder</TableHeaderColumn>
+            <TableHeaderColumn dataField="gener" dataSort>Genre</TableHeaderColumn>
+            <TableHeaderColumn dataField="mtime" dataSort>Duration</TableHeaderColumn>
+            <TableHeaderColumn dataField="ctime" dataSort>Created</TableHeaderColumn>
+            <TableHeaderColumn dataField="mtime" dataSort>Modified</TableHeaderColumn>
+          </BootstrapTable>
+	);
 	
 
     return (
@@ -280,7 +258,6 @@ class Assets extends Component {
              {formItems}
               </Col>
               </Row>
-              {_tableData}
               </TabPane>
               <TabPane tabId="Fill">
               <Row>
@@ -313,7 +290,15 @@ class Assets extends Component {
               {formItems}
               </Col>
               </Row>
-              {_tableData}
+              <BootstrapTable data={items.data} version="4" striped hover pagination options={this.options}>
+                 <TableHeaderColumn isKey dataField="title" dataSort>Title</TableHeaderColumn>
+                <TableHeaderColumn dataField="idec" dataSort>IDEC</TableHeaderColumn>
+                <TableHeaderColumn dataField="id_folder" dataSort>Folder</TableHeaderColumn>
+                <TableHeaderColumn dataField="gener" dataSort>Genre</TableHeaderColumn>
+                <TableHeaderColumn dataField="mtime" dataSort>Duration</TableHeaderColumn>
+                <TableHeaderColumn dataField="ctime" dataSort>Created</TableHeaderColumn>
+                <TableHeaderColumn dataField="mtime" dataSort>Modified</TableHeaderColumn>
+              </BootstrapTable>
               </TabPane>
               <TabPane tabId="Music">
               <Row>
@@ -346,7 +331,15 @@ class Assets extends Component {
               {formItems}
               </Col>
               </Row>
-              {_tableData}
+              <BootstrapTable data={items.data} version="4" striped hover pagination options={this.options}>
+                 <TableHeaderColumn isKey dataField="title" dataSort>Title</TableHeaderColumn>
+                <TableHeaderColumn dataField="idec" dataSort>IDEC</TableHeaderColumn>
+                <TableHeaderColumn dataField="id_folder" dataSort>Folder</TableHeaderColumn>
+                <TableHeaderColumn dataField="gener" dataSort>Genre</TableHeaderColumn>
+                <TableHeaderColumn dataField="mtime" dataSort>Duration</TableHeaderColumn>
+                <TableHeaderColumn dataField="ctime" dataSort>Created</TableHeaderColumn>
+                <TableHeaderColumn dataField="mtime" dataSort>Modified</TableHeaderColumn>
+              </BootstrapTable>
               </TabPane>
               <TabPane tabId="Stories">
               <Row>
@@ -379,7 +372,15 @@ class Assets extends Component {
               {formItems}
               </Col>
               </Row>
-              {_tableData}
+              <BootstrapTable data={items.data} version="4" striped hover pagination options={this.options}>
+                <TableHeaderColumn isKey dataField="title" dataSort>Title</TableHeaderColumn>
+                <TableHeaderColumn dataField="idec" dataSort>IDEC</TableHeaderColumn>
+                <TableHeaderColumn dataField="id_folder" dataSort>Folder</TableHeaderColumn>
+                <TableHeaderColumn dataField="gener" dataSort>Genre</TableHeaderColumn>
+                <TableHeaderColumn dataField="mtime" dataSort>Duration</TableHeaderColumn>
+                <TableHeaderColumn dataField="ctime" dataSort>Created</TableHeaderColumn>
+                <TableHeaderColumn dataField="mtime" dataSort>Modified</TableHeaderColumn>
+              </BootstrapTable>
               </TabPane>
               <TabPane tabId="Commercial">
               <Row>
@@ -412,7 +413,15 @@ class Assets extends Component {
               {formItems}
               </Col>
               </Row>
-              {_tableData}
+              <BootstrapTable data={items.data} version="4" striped hover pagination options={this.options}>
+                 <TableHeaderColumn isKey dataField="title" dataSort>Title</TableHeaderColumn>
+                <TableHeaderColumn dataField="idec" dataSort>IDEC</TableHeaderColumn>
+                <TableHeaderColumn dataField="id_folder" dataSort>Folder</TableHeaderColumn>
+                <TableHeaderColumn dataField="gener" dataSort>Genre</TableHeaderColumn>
+                <TableHeaderColumn dataField="mtime" dataSort>Duration</TableHeaderColumn>
+                <TableHeaderColumn dataField="ctime" dataSort>Created</TableHeaderColumn>
+                <TableHeaderColumn dataField="mtime" dataSort>Modified</TableHeaderColumn>
+              </BootstrapTable>
               </TabPane>
               <TabPane tabId="Incoming">
               <Row>
@@ -445,7 +454,15 @@ class Assets extends Component {
               {formItems}
               </Col>
               </Row>
-              {_tableData}
+              <BootstrapTable data={items.data} version="4" striped hover pagination options={this.options}>
+                 <TableHeaderColumn isKey dataField="title" dataSort>Title</TableHeaderColumn>
+                <TableHeaderColumn dataField="idec" dataSort>IDEC</TableHeaderColumn>
+                <TableHeaderColumn dataField="id_folder" dataSort>Folder</TableHeaderColumn>
+                <TableHeaderColumn dataField="gener" dataSort>Genre</TableHeaderColumn>
+                <TableHeaderColumn dataField="mtime" dataSort>Duration</TableHeaderColumn>
+                <TableHeaderColumn dataField="ctime" dataSort>Created</TableHeaderColumn>
+                <TableHeaderColumn dataField="mtime" dataSort>Modified</TableHeaderColumn>
+              </BootstrapTable>
               </TabPane>
               <TabPane tabId="Archive">
               <Row>
@@ -478,7 +495,15 @@ class Assets extends Component {
               {formItems}
               </Col>
               </Row>
-              {_tableData}
+              <BootstrapTable data={items.data} version="4" striped hover pagination options={this.options}>
+                <TableHeaderColumn isKey dataField="title" dataSort>Title</TableHeaderColumn>
+                <TableHeaderColumn dataField="idec" dataSort>IDEC</TableHeaderColumn>
+                <TableHeaderColumn dataField="id_folder" dataSort>Folder</TableHeaderColumn>
+                <TableHeaderColumn dataField="gener" dataSort>Genre</TableHeaderColumn>
+                <TableHeaderColumn dataField="mtime" dataSort>Duration</TableHeaderColumn>
+                <TableHeaderColumn dataField="ctime" dataSort>Created</TableHeaderColumn>
+                <TableHeaderColumn dataField="mtime" dataSort>Modified</TableHeaderColumn>
+              </BootstrapTable>
               </TabPane>
               <TabPane tabId="Trash">
               <Row>
@@ -511,7 +536,16 @@ class Assets extends Component {
              {formItems}
               </Col>
               </Row>
-              {_tableData}
+              <BootstrapTable data={items.data} version="4" striped hover pagination options={this.options}>
+                
+                <TableHeaderColumn isKey dataField="title" dataSort>Title</TableHeaderColumn>
+                <TableHeaderColumn dataField="idec" dataSort>IDEC</TableHeaderColumn>
+                <TableHeaderColumn dataField="id_folder" dataSort>Folder</TableHeaderColumn>
+                <TableHeaderColumn dataField="gener" dataSort>Genre</TableHeaderColumn>
+                <TableHeaderColumn dataField="mtime" dataSort>Duration</TableHeaderColumn>
+                <TableHeaderColumn dataField="ctime" dataSort>Created</TableHeaderColumn>
+                <TableHeaderColumn dataField="mtime" dataSort>Modified</TableHeaderColumn>
+              </BootstrapTable>
               </TabPane>
             </TabContent>
           </Col>
