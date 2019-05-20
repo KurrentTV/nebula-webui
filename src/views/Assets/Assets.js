@@ -77,7 +77,8 @@ class Assets extends Component {
     if (this.state.activeTab !== tab) {
       this.setState({
         activeTab: tab,
-        tableItems: false
+        tableItems: false,
+        isLoaded: false
       });
 
       let viewType = 1;
@@ -160,18 +161,7 @@ class Assets extends Component {
 	}
 	else
 	{
-		_tableData = (
-			<BootstrapTable data={items.data} version="4" striped hover pagination options={this.options}>
-	            <TableHeaderColumn isKey dataField="title" dataSort>Title</TableHeaderColumn>
-	             <TableHeaderColumn dataField="subtitle" dataFormat={ this.subTitleFormat } dataSort >Sub Title</TableHeaderColumn>
-	            <TableHeaderColumn dataField="idec" dataFormat={ this.subTitleFormat } dataSort>IDEC</TableHeaderColumn>
-	            <TableHeaderColumn dataField="id_folder" dataSort>Folder</TableHeaderColumn>
-	            <TableHeaderColumn dataField="gener" dataFormat={ this.subTitleFormat } dataSort>Genre</TableHeaderColumn>
-	            <TableHeaderColumn dataField="duration" dataSort>Duration</TableHeaderColumn>
-	            <TableHeaderColumn dataFormat={ this.formatTime } dataField="ctime" dataSort>Created</TableHeaderColumn>
-	            <TableHeaderColumn dataField="mtime" dataFormat={ this.formatTime } dataSort>Modified</TableHeaderColumn>
-	          </BootstrapTable>
-		);
+		_tableData = ( <div> Loading....</div>);
 	}
 	
 	
