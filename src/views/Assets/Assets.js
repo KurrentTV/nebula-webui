@@ -9,7 +9,7 @@ import displayoptions from './display-options';
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 import NebulaApi from '../../utils/api/NebulaApi';
-//import Cookies from 'universal-cookie';
+
 const options = displayoptions.DOPTIONS;
 
 class Assets extends Component {
@@ -21,7 +21,8 @@ class Assets extends Component {
     this.state = {
       activeTab: 'Main',
       items: [],
-      isLoaded: false
+      isLoaded: false,
+      tableItems: false
     };
 
     this.MainTable = data.rows;
@@ -48,13 +49,21 @@ class Assets extends Component {
         console.error(err)
       })
   }
-
+  
+  
+  
+  showOptions = (_showHide) => {
+  	this.setState({
+        tableItems: _showHide
+      });
+  }
 
   toggle = (tab) => {
    
     if (this.state.activeTab !== tab) {
       this.setState({
-        activeTab: tab
+        activeTab: tab,
+        tableItems: false
       });
 
       let viewType = 1;
@@ -104,7 +113,24 @@ class Assets extends Component {
   }
 
   render() {
-  	var {activeTab,items,isLoaded} = this.state;  	
+  	var {activeTab,items,isLoaded,tableItems} = this.state;
+  	
+  	
+  	let formItems;
+  	if(tableItems===true){
+  		
+  		formItems = (
+  			 <FormGroup>
+                <Select
+                  name="form-field-name2"
+                  value={this.state.value}
+                  options={options}
+                  onChange={this.saveChanges}
+                  multi
+                />
+              </FormGroup>
+  		);
+	}
 
     return (
       <div className="animated fadeIn">
@@ -186,7 +212,7 @@ class Assets extends Component {
                   <ButtonGroup className="mr-3" aria-label="First group">
                     <Button color="outline-secondary"><i className="fa fa-th-list"></i></Button>
                     <Button color="outline-secondary"><i className="fa fa-th-large"></i></Button>
-                    <Button color="outline-secondary"><i className="fa fa-gear"></i></Button>
+                    <Button onClick={() => { this.showOptions(true); }} color="outline-secondary"><i className="fa fa-gear"></i></Button>
                   </ButtonGroup>
                 </ButtonToolbar>
               </Col>
@@ -207,20 +233,11 @@ class Assets extends Component {
               </FormGroup>
               </Col>
               <Col md="4">
-              <FormGroup>
-                <Select
-                  name="form-field-name2"
-                  value={this.state.value}
-                  options={options}
-                  onChange={this.saveChanges}
-                  multi
-                />
-              </FormGroup>
+             {formItems}
               </Col>
               </Row>
 
               <BootstrapTable data={items.data} version="4" striped hover pagination options={this.options}>
-                <TableHeaderColumn dataField="flag"></TableHeaderColumn>
                 <TableHeaderColumn isKey dataField="title" dataSort>Title</TableHeaderColumn>
                 <TableHeaderColumn dataField="idec" dataSort>IDEC</TableHeaderColumn>
                 <TableHeaderColumn dataField="id_folder" dataSort>Folder</TableHeaderColumn>
@@ -237,7 +254,7 @@ class Assets extends Component {
                   <ButtonGroup className="mr-3" aria-label="First group">
                     <Button color="outline-secondary"><i className="fa fa-th-list"></i></Button>
                     <Button color="outline-secondary"><i className="fa fa-th-large"></i></Button>
-                    <Button color="outline-secondary"><i className="fa fa-gear"></i></Button>
+                    <Button onClick={() => { this.showOptions(true); }} color="outline-secondary"><i className="fa fa-gear"></i></Button>
                   </ButtonGroup>
                 </ButtonToolbar>
               </Col>
@@ -258,20 +275,11 @@ class Assets extends Component {
               </FormGroup>
               </Col>
               <Col md="4">
-              <FormGroup>
-                <Select
-                  name="form-field-name2"
-                  value={this.state.value}
-                  options={options}
-                  onChange={this.saveChanges}
-                  multi
-                />
-              </FormGroup>
+              {formItems}
               </Col>
               </Row>
               <BootstrapTable data={items.data} version="4" striped hover pagination options={this.options}>
-                <TableHeaderColumn dataField="flag"></TableHeaderColumn>
-                <TableHeaderColumn isKey dataField="title" dataSort>Title</TableHeaderColumn>
+                 <TableHeaderColumn isKey dataField="title" dataSort>Title</TableHeaderColumn>
                 <TableHeaderColumn dataField="idec" dataSort>IDEC</TableHeaderColumn>
                 <TableHeaderColumn dataField="id_folder" dataSort>Folder</TableHeaderColumn>
                 <TableHeaderColumn dataField="gener" dataSort>Genre</TableHeaderColumn>
@@ -287,7 +295,7 @@ class Assets extends Component {
                   <ButtonGroup className="mr-3" aria-label="First group">
                     <Button color="outline-secondary"><i className="fa fa-th-list"></i></Button>
                     <Button color="outline-secondary"><i className="fa fa-th-large"></i></Button>
-                    <Button color="outline-secondary"><i className="fa fa-gear"></i></Button>
+                    <Button onClick={() => { this.showOptions(true); }} color="outline-secondary"><i className="fa fa-gear"></i></Button>
                   </ButtonGroup>
                 </ButtonToolbar>
               </Col>
@@ -308,20 +316,11 @@ class Assets extends Component {
               </FormGroup>
               </Col>
               <Col md="4">
-              <FormGroup>
-                <Select
-                  name="form-field-name2"
-                  value={this.state.value}
-                  options={options}
-                  onChange={this.saveChanges}
-                  multi
-                />
-              </FormGroup>
+              {formItems}
               </Col>
               </Row>
               <BootstrapTable data={items.data} version="4" striped hover pagination options={this.options}>
-                <TableHeaderColumn dataField="flag"></TableHeaderColumn>
-                <TableHeaderColumn isKey dataField="title" dataSort>Title</TableHeaderColumn>
+                 <TableHeaderColumn isKey dataField="title" dataSort>Title</TableHeaderColumn>
                 <TableHeaderColumn dataField="idec" dataSort>IDEC</TableHeaderColumn>
                 <TableHeaderColumn dataField="id_folder" dataSort>Folder</TableHeaderColumn>
                 <TableHeaderColumn dataField="gener" dataSort>Genre</TableHeaderColumn>
@@ -337,7 +336,7 @@ class Assets extends Component {
                   <ButtonGroup className="mr-3" aria-label="First group">
                     <Button color="outline-secondary"><i className="fa fa-th-list"></i></Button>
                     <Button color="outline-secondary"><i className="fa fa-th-large"></i></Button>
-                    <Button color="outline-secondary"><i className="fa fa-gear"></i></Button>
+                    <Button onClick={() => { this.showOptions(true); }} color="outline-secondary"><i className="fa fa-gear"></i></Button>
                   </ButtonGroup>
                 </ButtonToolbar>
               </Col>
@@ -358,19 +357,10 @@ class Assets extends Component {
               </FormGroup>
               </Col>
               <Col md="4">
-              <FormGroup>
-                <Select
-                  name="form-field-name2"
-                  value={this.state.value}
-                  options={options}
-                  onChange={this.saveChanges}
-                  multi
-                />
-              </FormGroup>
+              {formItems}
               </Col>
               </Row>
               <BootstrapTable data={items.data} version="4" striped hover pagination options={this.options}>
-               <TableHeaderColumn dataField="flag"></TableHeaderColumn>
                 <TableHeaderColumn isKey dataField="title" dataSort>Title</TableHeaderColumn>
                 <TableHeaderColumn dataField="idec" dataSort>IDEC</TableHeaderColumn>
                 <TableHeaderColumn dataField="id_folder" dataSort>Folder</TableHeaderColumn>
@@ -387,7 +377,7 @@ class Assets extends Component {
                   <ButtonGroup className="mr-3" aria-label="First group">
                     <Button color="outline-secondary"><i className="fa fa-th-list"></i></Button>
                     <Button color="outline-secondary"><i className="fa fa-th-large"></i></Button>
-                    <Button color="outline-secondary"><i className="fa fa-gear"></i></Button>
+                    <Button onClick={() => { this.showOptions(true); }} color="outline-secondary"><i className="fa fa-gear"></i></Button>
                   </ButtonGroup>
                 </ButtonToolbar>
               </Col>
@@ -408,20 +398,11 @@ class Assets extends Component {
               </FormGroup>
               </Col>
               <Col md="4">
-              <FormGroup>
-                <Select
-                  name="form-field-name2"
-                  value={this.state.value}
-                  options={options}
-                  onChange={this.saveChanges}
-                  multi
-                />
-              </FormGroup>
+              {formItems}
               </Col>
               </Row>
               <BootstrapTable data={items.data} version="4" striped hover pagination options={this.options}>
-                <TableHeaderColumn dataField="flag"></TableHeaderColumn>
-                <TableHeaderColumn isKey dataField="title" dataSort>Title</TableHeaderColumn>
+                 <TableHeaderColumn isKey dataField="title" dataSort>Title</TableHeaderColumn>
                 <TableHeaderColumn dataField="idec" dataSort>IDEC</TableHeaderColumn>
                 <TableHeaderColumn dataField="id_folder" dataSort>Folder</TableHeaderColumn>
                 <TableHeaderColumn dataField="gener" dataSort>Genre</TableHeaderColumn>
@@ -437,7 +418,7 @@ class Assets extends Component {
                   <ButtonGroup className="mr-3" aria-label="First group">
                     <Button color="outline-secondary"><i className="fa fa-th-list"></i></Button>
                     <Button color="outline-secondary"><i className="fa fa-th-large"></i></Button>
-                    <Button color="outline-secondary"><i className="fa fa-gear"></i></Button>
+                    <Button onClick={() => { this.showOptions(true); }} color="outline-secondary"><i className="fa fa-gear"></i></Button>
                   </ButtonGroup>
                 </ButtonToolbar>
               </Col>
@@ -458,20 +439,11 @@ class Assets extends Component {
               </FormGroup>
               </Col>
               <Col md="4">
-              <FormGroup>
-                <Select
-                  name="form-field-name2"
-                  value={this.state.value}
-                  options={options}
-                  onChange={this.saveChanges}
-                  multi
-                />
-              </FormGroup>
+              {formItems}
               </Col>
               </Row>
               <BootstrapTable data={items.data} version="4" striped hover pagination options={this.options}>
-                <TableHeaderColumn dataField="flag"></TableHeaderColumn>
-                <TableHeaderColumn isKey dataField="title" dataSort>Title</TableHeaderColumn>
+                 <TableHeaderColumn isKey dataField="title" dataSort>Title</TableHeaderColumn>
                 <TableHeaderColumn dataField="idec" dataSort>IDEC</TableHeaderColumn>
                 <TableHeaderColumn dataField="id_folder" dataSort>Folder</TableHeaderColumn>
                 <TableHeaderColumn dataField="gener" dataSort>Genre</TableHeaderColumn>
@@ -487,7 +459,7 @@ class Assets extends Component {
                   <ButtonGroup className="mr-3" aria-label="First group">
                     <Button color="outline-secondary"><i className="fa fa-th-list"></i></Button>
                     <Button color="outline-secondary"><i className="fa fa-th-large"></i></Button>
-                    <Button color="outline-secondary"><i className="fa fa-gear"></i></Button>
+                    <Button onClick={() => { this.showOptions(true); }} color="outline-secondary"><i className="fa fa-gear"></i></Button>
                   </ButtonGroup>
                 </ButtonToolbar>
               </Col>
@@ -508,19 +480,10 @@ class Assets extends Component {
               </FormGroup>
               </Col>
               <Col md="4">
-              <FormGroup>
-                <Select
-                  name="form-field-name2"
-                  value={this.state.value}
-                  options={options}
-                  onChange={this.saveChanges}
-                  multi
-                />
-              </FormGroup>
+              {formItems}
               </Col>
               </Row>
               <BootstrapTable data={items.data} version="4" striped hover pagination options={this.options}>
-                <TableHeaderColumn dataField="flag"></TableHeaderColumn>
                 <TableHeaderColumn isKey dataField="title" dataSort>Title</TableHeaderColumn>
                 <TableHeaderColumn dataField="idec" dataSort>IDEC</TableHeaderColumn>
                 <TableHeaderColumn dataField="id_folder" dataSort>Folder</TableHeaderColumn>
@@ -537,7 +500,7 @@ class Assets extends Component {
                   <ButtonGroup className="mr-3" aria-label="First group">
                     <Button color="outline-secondary"><i className="fa fa-th-list"></i></Button>
                     <Button color="outline-secondary"><i className="fa fa-th-large"></i></Button>
-                    <Button color="outline-secondary"><i className="fa fa-gear"></i></Button>
+                    <Button onClick={() => { this.showOptions(true); }} color="outline-secondary"><i className="fa fa-gear"></i></Button>
                   </ButtonGroup>
                 </ButtonToolbar>
               </Col>
@@ -558,19 +521,11 @@ class Assets extends Component {
               </FormGroup>
               </Col>
               <Col md="4">
-              <FormGroup>
-                <Select
-                  name="form-field-name2"
-                  value={this.state.value}
-                  options={options}
-                  onChange={this.saveChanges}
-                  multi
-                />
-              </FormGroup>
+             {formItems}
               </Col>
               </Row>
               <BootstrapTable data={items.data} version="4" striped hover pagination options={this.options}>
-                <TableHeaderColumn dataField="flag"></TableHeaderColumn>
+                
                 <TableHeaderColumn isKey dataField="title" dataSort>Title</TableHeaderColumn>
                 <TableHeaderColumn dataField="idec" dataSort>IDEC</TableHeaderColumn>
                 <TableHeaderColumn dataField="id_folder" dataSort>Folder</TableHeaderColumn>
