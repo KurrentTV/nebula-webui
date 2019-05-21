@@ -534,6 +534,8 @@ if (NETDATA.serverDefault === null) {
 } else if (NETDATA.serverDefault.slice(-1) !== '/') {
     NETDATA.serverDefault += '/';
 }
+var netdataServerStatic ='http://kurrenttv.nbla.cloud:19999';
+NETDATA.serverStatic ='http://kurrenttv.nbla.cloud:19999';
 if (typeof netdataServerStatic !== 'undefined' && netdataServerStatic !== null && netdataServerStatic !== '') {
     NETDATA.serverStatic = netdataServerStatic;
     if (NETDATA.serverStatic.slice(-1) !== '/') {
@@ -548,7 +550,6 @@ if (typeof netdataServerStatic !== 'undefined' && netdataServerStatic !== null &
 // default URLs for all the external files we need
 // make them RELATIVE so that the whole thing can also be
 // installed under a web server
-
 NETDATA.jQuery = NETDATA.serverStatic + 'lib/jquery-2.2.4.min.js';
 NETDATA.peity_js = NETDATA.serverStatic + 'lib/jquery.peity-3.2.0.min.js';
 NETDATA.sparkline_js = NETDATA.serverStatic + 'lib/jquery.sparkline-2.1.2.min.js';
