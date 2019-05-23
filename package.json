@@ -73,6 +73,7 @@
   },
   "scripts": {
     "start": "HTTPS=true react-scripts start",
+    "dev": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "test:cov": "react-scripts test --coverage",

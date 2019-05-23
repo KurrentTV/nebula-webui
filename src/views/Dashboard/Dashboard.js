@@ -22,7 +22,12 @@ import {
 } from 'reactstrap';
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import { getStyle, hexToRgba } from '@coreui/coreui-pro/dist/js/coreui-utilities'
+import NebulaApi from '../../utils/api/NebulaApi';
+/*import * from '../../utils/netdata/lib';
+import * from '../../utils/netdata/css';
+import * from '../../utils/netdata/images';*/
 
+import axios from "axios";
 const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
 
 const brandPrimary = getStyle('--primary')
@@ -462,9 +467,65 @@ class Dashboard extends Component {
     this.state = {
       dropdownOpen: false,
       radioSelected: 2,
+      assetCountStatus: false,
+      assetCount: 0,
+      itemsCountStatus: false,
+      itemsCount: 0,
+      binCountStatus: false,
+      binCounts: 0,
+      eventsCountStatus: false,
+      eventsCount: 0
+      
     };
   }
-
+  NetDataHost = "http://kurrenttv.nbla.cloud:19999";
+  componentDidMount() {
+  	var that = this;
+  	const data = { object_type: 'asset'};  
+  	const itemsdata = { object_type: 'item'};
+  	const bindata = { object_type: 'bin'};
+  	const eventsdata = { object_type: 'event'};
+  	
+  	NebulaApi.getAssets(data).then(res => {      	     	
+        this.setState({
+          assetCount: res.data.count,
+          assetCountStatus: true
+        })}
+       ).catch( err => {
+        console.error(err)
+      });
+      
+      /* set items count */
+      /*
+      NebulaApi.getAssets(bindata).then(res => {      	     	
+        this.setState({
+          itemsCount: res,
+          itemsCountStatus: true
+        })}
+       ).catch( err => {
+        console.error(err)
+      });
+       /* set bin count */
+      
+     /* NebulaApi.getAssets(bindata).then(res => {      	     	
+        this.setState({
+          binCounts: res.data.count,
+          binCountStatus: true
+        })}
+       ).catch( err => {
+        console.error(err)
+      });
+       /* set event count */
+      /*
+      NebulaApi.getAssets(eventsdata).then(res => {      	     	
+        this.setState({
+          eventsCount: res.data.count,
+          eventsCountStatus: true
+        })}
+       ).catch( err => {
+        console.error(err)
+      });*/
+  }	 
   toggle() {
     this.setState({
       dropdownOpen: !this.state.dropdownOpen,
@@ -480,7 +541,12 @@ class Dashboard extends Component {
   loading = () => <div className="animated fadeIn pt-1 text-center">Loading...</div>
 
   render() {
-
+	var {assetCountStatus, assetCount, itemsCountStatus, itemsCount, binCountStatus, binCounts, eventsCountStatus, eventsCount} = this.state;
+	var netdataStyle = {
+		marginRight:'10px',
+		width:'11%',
+		willchange: 'transform'
+	}
     return (
       <div className="animated fadeIn">
         <Row>
@@ -500,7 +566,7 @@ class Dashboard extends Component {
                     </DropdownMenu>
                   </ButtonDropdown>
                 </ButtonGroup>
-                <div className="text-value">42</div>
+                <div className="text-value">{assetCount}</div>
                 <div>Assets</div>
                 <div className="chart-wrapper mt-3" style={{ height: '70px' }}>
                   <Line data={cardChartData2} options={cardChartOpts2} height={70} />
@@ -524,7 +590,7 @@ class Dashboard extends Component {
                     </DropdownMenu>
                   </Dropdown>
                 </ButtonGroup>
-                <div className="text-value">6</div>
+                <div className="text-value">{itemsCount}</div>
                 <div>Items</div>
                 <div className="chart-wrapper mt-3" style={{ height: '70px' }}>
                   <Line data={cardChartData1} options={cardChartOpts1} height={70} />
@@ -548,7 +614,7 @@ class Dashboard extends Component {
                     </DropdownMenu>
                   </Dropdown>
                 </ButtonGroup>
-                <div className="text-value">2</div>
+                <div className="text-value">{binCounts}</div>
                 <div>Bins</div>
               </CardBody>
               <div className="chart-wrapper mt-3" style={{ height: '70px' }}>
@@ -572,7 +638,7 @@ class Dashboard extends Component {
                     </DropdownMenu>
                   </ButtonDropdown>
                 </ButtonGroup>
-                <div className="text-value">2</div>
+                <div className="text-value">{eventsCount}</div>
                 <div>Events</div>
               </CardBody>
               <div className="chart-wrapper mt-3 mx-3" style={{ height: '70px' }}>
@@ -782,7 +848,91 @@ class Dashboard extends Component {
             </CardBody>
             <CardFooter>
               <Row className="text-center">
-                <img src="/assets/img/netdata.png" style={{ width: 100 + '%' }}></img>
+              	<div style={{width:'100%',maxHeight:'calc(100% - 15px)',textAlign:'center', display:'inline-block'}}>
+					<div style={{width:'100%', height:'100%', align:'center', display:'inline-block'}}>
+	                
+               <div className="netdata-container-easypiechart" style={{marginRight:'11px'}} data-netdata="system.io" data-host={this.NetDataHost} data-dimensions="in"
+									    data-chart-library="easypiechart"
+									    data-title="Disk Read"
+									    data-width="10%"
+									    data-before="0"
+									    data-after="-420"
+									    data-points="420"
+									    data-common-units="system.io.mainhead"
+									    role="application">
+									</div>
+									<div className="netdata-container-easypiechart" style={{marginRight:'11px'}} data-netdata="system.io" data-host={this.NetDataHost}
+									    data-dimensions="out"
+									    data-chart-library="easypiechart"
+									    data-title="Disk Write"
+									    data-width="10%"
+									    data-before="0"
+									    data-after="-420"
+									    data-points="420"
+									    data-common-units="system.io.mainhead"
+									    role="application">
+									</div>
+									<div data-netdata="disk_space._"
+									data-host={this.NetDataHost}
+									    data-decimal-digits="0"
+									    data-title="Available Disk"
+									    data-dimensions="avail"
+									    data-chart-library="easypiechart"
+									    data-easypiechart-max-value="100"
+									    data-common-max="avail"
+									    data-width="11%"
+									    data-height="100%"
+									    data-after="-420"
+									    data-points="420"
+									    role="application">
+									    </div>
+									<div className="netdata-container-gauge" style={{marginRight:'11px'}} data-netdata="system.cpu"  data-host={this.NetDataHost}
+									    data-chart-library="gauge"
+									    data-title="CPU"
+									    data-units="%"
+									    data-gauge-max-value="100"
+									    data-width="20%"
+									    data-after="-420"
+									    data-points="420"
+									    data-colors="#22AA99"
+									    role="application">
+									</div>
+									<div className="netdata-container-easypiechart" style={netdataStyle} data-netdata="system.ram" data-host={this.NetDataHost}
+									    data-dimensions="used|buffers|active|wired"
+									    data-append-options="percentage"
+									    data-chart-library="easypiechart"
+									    data-title="Used RAM"
+									    data-units="%"
+									    data-easypiechart-max-value="100"
+									    data-width="11%"
+									    data-after="-420"
+									    data-points="420"
+									    data-colors="#EE9911"
+									    role="application">
+									</div>
+									<div className="netdata-container-easypiechart" style={netdataStyle} data-netdata="system.net" data-host={this.NetDataHost}
+									    data-dimensions="received"
+									    data-chart-library="easypiechart"
+									    data-title="Net Inbound"
+									    data-width="10%"
+									    data-before="0"
+									    data-after="-420"
+									    data-points="420"
+									    data-common-units="system.net.mainhead"
+									    role="application">
+									</div>
+									<div className="netdata-container-easypiechart" style={netdataStyle} data-netdata="system.net" data-host={this.NetDataHost}
+									    data-dimensions="sent"
+									    data-chart-library="easypiechart"
+									    data-title="Net Outbound" data-width="10%"
+									    data-before="0"
+									    data-after="-420"
+									    data-points="420"
+									    data-common-units="system.net.mainhead"
+									    role="application">
+									</div>
+									</div>
+									</div>
               </Row>
             </CardFooter>
           </Card>

@@ -3,7 +3,7 @@ import { HashRouter, Route, Switch } from 'react-router-dom';
 // import { renderRoutes } from 'react-router-config';
 import Loadable from 'react-loadable';
 import './App.scss';
-
+import 'react-bootstrap-table/dist/react-bootstrap-table.min.css';
 import CookiesHelper from './utils/CookiesHelper';
 import NebulaApi from './utils/api/NebulaApi';
 

@@ -28,4 +28,7 @@ export default class NebulaApi {
       data
     });
   }
+  static getDashboardData(assetData,itemsData,binData,eventsData) {
+  	return axios.all([this.getAssets(assetData), this.getAssets(itemsData),this.getAssets(binData),this.getAssets(eventsData)]);
+  }
 }
