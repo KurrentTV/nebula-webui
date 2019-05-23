@@ -498,7 +498,7 @@ NETDATA.fastNumberFormat = {
 // http://stackoverflow.com/questions/984510/what-is-my-script-src-url
 // http://stackoverflow.com/questions/6941533/get-protocol-domain-and-port-from-url
 NETDATA._scriptSource = function () {
-    let script;
+    let script = null;
 
     if (typeof document.currentScript !== 'undefined') {
         script = document.currentScript;
@@ -534,6 +534,7 @@ if (NETDATA.serverDefault === null) {
 } else if (NETDATA.serverDefault.slice(-1) !== '/') {
     NETDATA.serverDefault += '/';
 }
+
 if (typeof netdataServerStatic !== 'undefined' && netdataServerStatic !== null && netdataServerStatic !== '') {
     NETDATA.serverStatic = netdataServerStatic;
     if (NETDATA.serverStatic.slice(-1) !== '/') {
