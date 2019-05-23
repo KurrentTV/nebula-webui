@@ -36,12 +36,75 @@ class Assets extends Component {
       withFirstAndLast: false,
     };
   }
+	
   subTitleFormat(cell){  
   	if(cell === "" || cell == 'undefined' || cell == null) 
   	return "-";
   	else return cell;
   		
   }
+  folderName(cell){  
+  
+  	let folder = '';
+  	 if(cell != '')
+  	 {
+	 	switch(cell)
+	 	{
+			case 1:
+			folder= <span className='badge' style={{padding:'5px',color:'#eee',background:'#20a8d8'}}> Movie </span>
+			break;
+			case 2:
+			folder= <span className='badge' style={{padding:'5px',color:'#eee',background:'#6610f2'}}> Serie </span>
+			break;
+			case 3:
+			folder= <span className='badge' style={{padding:'5px',color:'#eee',background:'#6f42c1'}}> Story </span>
+			break;
+			case 4:
+			folder= <span className='badge' style={{padding:'5px',color:'#eee',background:'#e83e8c'}}> Song </span>
+			break;
+			case 5:
+			folder= <span className='badge' style={{padding:'5px',color:'#000',background:'#f86c6b'}}> Fill </span>
+			break;
+			case 6:
+			folder= <span className='badge' style={{padding:'5px',color:'#fff',background:'#A30E02'}}> Trailer </span>
+			break;
+			case 7:
+			folder= <span className='badge' style={{padding:'5px',color:'#000',background:'#E09C2D'}}> Jingle </span>
+			break;
+			case 8:
+			folder= <span className='badge' style={{padding:'5px',color:'#eee',background:'#4dbd74'}}> Graphics </span>
+			break;
+			case 9:
+			folder= <span className='badge' style={{padding:'5px',color:'#eee',background:'#17a2b8'}}> Commercial </span>
+			break;
+			case 10:
+			folder= <span className='badge' style={{padding:'5px',color:'#eee',background:'#73818f'}}> Teleshopping </span>
+			break;
+			case 11:
+			folder= <span className='badge' style={{padding:'5px',color:'#eee',background:'#2f353a'}}> Dataset </span>
+			break;
+			case 12:
+			folder= <span className='badge' style={{padding:'5px',color:'#eee',background:'#F63C3A'}}> Incoming </span>
+			break;
+		}
+	 }
+	 return folder;
+  }
+  secondsToHms(d){  	
+  	if(d !== "" && d !== undefined)
+  	{
+	   const fps = 25;
+	   const pad2 = txt => ( '0' + Math.floor( txt ) ).substr( -2 ),
+	         h = pad2( d / 3600 ),
+	         m = pad2( d % 3600 / 60 ),
+	         s = pad2( d % 60 ),
+	         f = pad2( d % 1 * fps ); // +1 here for one based frame
+	   return `${h}:${m}:${s}:${f}`;	
+	}
+	else 
+		return '00:00:00.00';
+  	
+	}
   formatTime(cell){
   	var date = new Date(cell*1000);  
   	var d = date.getDay();
@@ -73,7 +136,7 @@ class Assets extends Component {
   }
 
   toggle = (tab) => {
-   
+   console.log(tab);
     if (this.state.activeTab !== tab) {
       this.setState({
         activeTab: tab,
@@ -128,6 +191,10 @@ class Assets extends Component {
   }
 
   render() {
+  	var foldetStyle = {
+		padding:'5px',
+		color: 'eee'
+	}
   	var {activeTab,items,isLoaded,tableItems} = this.state;  	
   	let formItems;let _tableData;
   	if(tableItems===true){
@@ -151,9 +218,9 @@ class Assets extends Component {
 	            <TableHeaderColumn isKey dataField="title" dataSort>Title</TableHeaderColumn>
 	             <TableHeaderColumn dataField="subtitle" dataFormat={ this.subTitleFormat } dataSort>Sub Title</TableHeaderColumn>
 	            <TableHeaderColumn dataField="idec" dataFormat={ this.subTitleFormat } dataSort>IDEC</TableHeaderColumn>
-	            <TableHeaderColumn dataField="id_folder" dataSort>Folder</TableHeaderColumn>
+	            <TableHeaderColumn dataField="id_folder" dataSort dataFormat={this.folderName}>Folder</TableHeaderColumn>
 	            <TableHeaderColumn dataField="gener" dataFormat={ this.subTitleFormat } dataSort>Genre</TableHeaderColumn>
-	            <TableHeaderColumn dataField="duration" dataSort>Duration</TableHeaderColumn>
+	            <TableHeaderColumn dataField="duration" dataSort dataFormat={this.secondsToHms}>Duration</TableHeaderColumn>
 	            <TableHeaderColumn dataField="ctime" dataFormat={ this.formatTime } dataSort>Created</TableHeaderColumn>
 	            <TableHeaderColumn dataField="mtime" dataFormat={ this.formatTime } dataSort>Modified</TableHeaderColumn>
 	          </BootstrapTable>

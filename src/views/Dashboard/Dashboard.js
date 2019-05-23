@@ -924,8 +924,7 @@ class Dashboard extends Component {
 									<div className="netdata-container-easypiechart" style={netdataStyle} data-netdata="system.net" data-host={this.NetDataHost}
 									    data-dimensions="sent"
 									    data-chart-library="easypiechart"
-									    data-title="Net
-									    Outbound" data-width="10%"
+									    data-title="Net Outbound" data-width="10%"
 									    data-before="0"
 									    data-after="-420"
 									    data-points="420"
