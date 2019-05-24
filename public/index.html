@@ -23,10 +23,11 @@
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json">
     <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">
     
-    <script type="text/javascript" src="%PUBLIC_URL%/dashboard.js?v20170724-1"></script>
-
-     <script type="text/javascript">     
-    	netdataServer = 'http://kurrenttv.nbla.cloud:19999';
+ 
+  <script type="text/javascript" src="%PUBLIC_URL%/dashboard.js?v20170724-1"></script>
+     <script type="text/javascript">    
+    	netdataNoBootstrap = false;
+    	var netdataTheme = 'slate';
     	NETDATA.options.current.destroy_on_hide = true;
 			// set this to false, to always show all dimensions
 			NETDATA.options.current.eliminate_zero_dimensions = true;
@@ -36,6 +37,7 @@
 			// set this to false
 			NETDATA.options.current.parallel_refresher = true;
     </script>
+     
     <!--
       Notice the use of %PUBLIC_URL% in the tags above.
       It will be replaced with the URL of the `public` folder during the build.
