@@ -51,7 +51,7 @@ class Assets extends Component {
 
 
   toggle = (tab) => {
-   
+
     if (this.state.activeTab !== tab) {
       this.setState({
         activeTab: tab
@@ -100,11 +100,11 @@ class Assets extends Component {
         }
       );
     }
-      
+
   }
 
   render() {
-  	var {activeTab,items,isLoaded} = this.state;  	
+  	var {activeTab,items,isLoaded} = this.state;
 
     return (
       <div className="animated fadeIn">
