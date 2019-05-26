@@ -5089,7 +5089,7 @@ var NETDATA = window.NETDATA || {};
                 type:"get",
                 data:{"DURL":u,"server":_url[0]},
                 cache: false,
-                async: false,
+                async: true,
                 croseDomain:true,                
                 dataType:"json",
             })
@@ -5362,7 +5362,7 @@ var NETDATA = window.NETDATA || {};
                    // jsonp: "jsonpcallback",
                     cache: false,                    
                     data:{'URL': this.chart_url},
-                    async: false,                    
+                    async: true,                    
                    // dataType: "jsonp",		                                                  
                     //xhrFields: { withCredentials: true } // required for the cookie
                 })

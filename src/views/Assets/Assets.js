@@ -219,8 +219,15 @@ class Assets extends Component {
 	if(isLoaded === true)
 	{
 		 var style = { 
-	        backgroundImage: 'url(/assets/img/hqdefault.jpg)',
+	        width:'100%'
 	    };
+	    var stImg = {
+			position:'absolute',
+			top:'50%',
+			left:'50%',
+			fontSize:'50px',
+			margin:'-25px 0px 0px -20px'
+		}
 		if(layout == 'List')
 		{
 			_tableData = (
@@ -242,16 +249,24 @@ class Assets extends Component {
 			<div className="react-bs-table-container" style={{overflow:'hidden'}} id="app-card-list">		        
 	        	  {items.data.map(item =>(
 	        	  		 <article key={item.id} className="card-grid">		
-						    <div style={style} className="card-grid-header">						        
+						    <div style={{position:'relative'}} className="card-grid-header">	
+						    	<img style={style} src="/assets/img/hqdefault.jpg" alt="boohoo" className="img-responsive"/>
+						    	<i style={stImg} className="fa fa-play-circle"></i>					        
 						    </div>
 						    <div className="card-grid-body">
+						     <h4 className="card-grid-title">{this.subTitleFormat(item.title)}</h4>	
+						     <i className="fa fa-circle text-success"></i>
+						     <span> </span>
+						     	<i className="fa fa-flag text-danger"></i>
+						     	<span> </span>
 						       {this.folderName(item.id_folder)} 
-						       
-						        <h4 className="card-grid-title">{this.subTitleFormat(item.title)}</h4>	
-						        <p className="body-content">{this.subTitleFormat(item.subtitle)}</p>
-						        <p className="date">Duration: {this.secondsToHms(item.duration)}</p>
-						        <p className="date">File Size: ------</p>					        				<p className="date">Created at: {this.formatTime(item.ctime)}</p>
-						        <p className="date">Modified at: {this.formatTime(item.mtime)}</p>	
+						       <span> </span>
+						       <button style={{background:'rgba(0, 0, 0, 0)'}} className="badge badge-block btn-outline-secondary" disabled="">{this.secondsToHms(item.duration)}</button>
+						       <span> </span>
+						       <button style={{background:'rgba(0, 0, 0, 0)'}} className="badge badge-block btn-outline-secondary" disabled="">{this.formatTime(item.ctime)}</button>
+						       <span> </span>
+						       <button style={{background:'rgba(0, 0, 0, 0)'}} className="badge badge-block btn-outline-secondary" disabled="">{this.formatTime(item.mtime)}</button>			
+						        
 						    </div>
 	        	  		 </article>	                           
                     ))}
