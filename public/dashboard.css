@@ -1,4 +1,12 @@
 /* SPDX-License-Identfier: GPL-3.0-or-later */
+html,
+body {
+    /*font-family: Calibri,"Segoe UI","Helvetica Neue",Helvetica,Arial,sans-serif;*/
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-style: normal;
+    font-variant: normal;
+}
+
 .morelink {
     color: #765d9c;
     text-decoration: none;

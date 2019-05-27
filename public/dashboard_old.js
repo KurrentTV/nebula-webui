@@ -1576,9 +1576,13 @@ var NETDATA = window.NETDATA || {};
                     url: baseURL + 'api/getCharts',
                     type:"get",
                      data:{'URL': this.chart_url},
-                    async: true,
+                    //async: true,
                     cache: false,
                     croseDomain:true,
+                    headers: {
+                    'Cache-Control': 'no-cache, no-store',
+                    'Pragma': 'no-cache'
+               		 }
                     //xhrFields: {withCredentials: true} // required for the cookie
                 })
                     .done(function (data) {
@@ -5089,7 +5093,7 @@ var NETDATA = window.NETDATA || {};
                 type:"get",
                 data:{"DURL":u,"server":_url[0]},
                 cache: false,
-                async: false,
+                //async: true,
                 croseDomain:true,                
                 dataType:"json",
             })
@@ -5362,7 +5366,11 @@ var NETDATA = window.NETDATA || {};
                    // jsonp: "jsonpcallback",
                     cache: false,                    
                     data:{'URL': this.chart_url},
-                    async: false,                    
+                    headers: {
+                    'Cache-Control': 'no-cache, no-store',
+                    'Pragma': 'no-cache'
+                }
+                    //async: true,                    
                    // dataType: "jsonp",		                                                  
                     //xhrFields: { withCredentials: true } // required for the cookie
                 })
@@ -8726,41 +8734,23 @@ var NETDATA = window.NETDATA || {};
 
     // ----------------------------------------------------------------------------------------------------------------
     // Load required JS libraries and CSS
-/* {
-            url: baseURL + 'assets/site/main/js/netdata/lib/bootstrap-3.3.7.min.js',
-            async: false,
-            isAlreadyLoaded: function() {
-                // check if bootstrap is loaded
-                if(typeof $().emulateTransitionEnd === 'function')
-                    return true;
-                else {
-                    return (typeof netdataNoBootstrap !== 'undefined' && netdataNoBootstrap === true);
-                }
-            }
-        },*/
+
     NETDATA.requiredJs = [
        
-        {
-        	//https://fonts.googleapis.com/css?family=Lato:100,300,400,700,900|Raleway:100,200,300,400,500,600,700,800,900
-            url: '',
-            async: true,
-            isAlreadyLoaded: function() {
-                return (typeof netdataNoFontAwesome !== 'undefined' && netdataNoFontAwesome === true);
-            }
-        },
+        
         {
             url: baseURL + 'assets/site/main/js/netdata/lib/perfect-scrollbar-0.6.15.min.js',
             isAlreadyLoaded: function() { return false; }
         }
     ];
-
-    NETDATA.requiredCSS = [
-        {
+/*{
             url: NETDATA.themes.current.bootstrap_css,
             isAlreadyLoaded: function() {
                 return (typeof netdataNoBootstrap !== 'undefined' && netdataNoBootstrap === true);
             }
-        },
+        },*/
+    NETDATA.requiredCSS = [
+        
         {
             url: NETDATA.themes.current.dashboard_css,
             isAlreadyLoaded: function() { return false; }
@@ -9507,12 +9497,4 @@ var NETDATA = window.NETDATA || {};
     });
 })(window, document, (typeof jQuery === 'function')?jQuery:undefined);
 
-function jsonpcallback(chart)
-{
-	var obj = JSON.parse(chart);
-    obj = NETDATA.xss.checkOptional('/api/v1/chart', obj);
-	chart = obj;
-    chart.url = that.chart_url;
-    that.__defaultsFromDownloadedChart(chart);
-    NETDATA.chartRegistry.add(that.host, that.id, chart);
-}
+

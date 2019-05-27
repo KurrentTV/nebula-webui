@@ -18,11 +18,13 @@ class Assets extends Component {
     super(props);
 
     this.toggle = this.toggle.bind(this);
+    this.showLayout = this.showLayout.bind(this);
     this.state = {
       activeTab: 'Main',
       items: [],
       isLoaded: false,
-      tableItems: false
+      tableItems: false,
+      layout: 'List'
     };
 
     this.MainTable = data.rows;
@@ -127,7 +129,11 @@ class Assets extends Component {
         console.error(err)
       })
   }  
-
+  showLayout = (_layout) => {
+  	this.setState({
+        layout: _layout
+      });
+  }
   
   showOptions = (_showHide) => {
   	this.setState({
@@ -135,8 +141,7 @@ class Assets extends Component {
       });
   }
 
-  toggle = (tab) => {
-   console.log(tab);
+  toggle = (tab) => {  
     if (this.state.activeTab !== tab) {
       this.setState({
         activeTab: tab,
@@ -195,7 +200,7 @@ class Assets extends Component {
 		padding:'5px',
 		color: 'eee'
 	}
-  	var {activeTab,items,isLoaded,tableItems} = this.state;  	
+  	var {activeTab,items,isLoaded,tableItems,layout} = this.state;  	
   	let formItems;let _tableData;
   	if(tableItems===true){
   		
@@ -213,7 +218,19 @@ class Assets extends Component {
 	}	
 	if(isLoaded === true)
 	{
-		_tableData = (
+		 var style = { 
+	        width:'100%'
+	    };
+	    var stImg = {
+			position:'absolute',
+			top:'50%',
+			left:'50%',
+			fontSize:'50px',
+			margin:'-25px 0px 0px -20px'
+		}
+		if(layout == 'List')
+		{
+			_tableData = (
 			<BootstrapTable data={items.data} version="4" striped hover pagination options={this.options}>
 	            <TableHeaderColumn isKey dataField="title" dataSort>Title</TableHeaderColumn>
 	             <TableHeaderColumn dataField="subtitle" dataFormat={ this.subTitleFormat } dataSort>Sub Title</TableHeaderColumn>
@@ -224,7 +241,39 @@ class Assets extends Component {
 	            <TableHeaderColumn dataField="ctime" dataFormat={ this.formatTime } dataSort>Created</TableHeaderColumn>
 	            <TableHeaderColumn dataField="mtime" dataFormat={ this.formatTime } dataSort>Modified</TableHeaderColumn>
 	          </BootstrapTable>
-		);
+			);
+		}
+		else if(layout == 'Grid')
+		{
+			_tableData = (			
+			<div className="react-bs-table-container" style={{overflow:'hidden',border:'1px solid #23282c',paddingTop:'1rem'}} id="app-card-list">		        
+	        	  {items.data.map(item =>(
+	        	  		 <article key={item.id} className="card-grid">		
+						    <div style={{position:'relative'}} className="card-grid-header">	
+						    	<img style={style} src="/assets/img/hqdefault.jpg" alt="boohoo" className="img-responsive"/>
+						    	<i style={stImg} className="fa fa-play-circle"></i>					        
+						    </div>
+						    <div className="card-grid-body">
+						     <h4 className="card-grid-title">{this.subTitleFormat(item.title)}</h4>	
+						     <i className="fa fa-circle text-success"></i>
+						     <span> </span>
+						     	<i className="fa fa-flag text-danger"></i>
+						     	<span> </span>
+						       {this.folderName(item.id_folder)} 
+						       <span> </span>
+						       <button style={{background:'rgba(0, 0, 0, 0)'}} className="badge badge-block btn-outline-secondary" disabled="">{this.secondsToHms(item.duration)}</button>
+						       <span> </span>
+						       <button style={{background:'rgba(0, 0, 0, 0)'}} className="badge badge-block btn-outline-secondary" disabled="">{this.formatTime(item.ctime)}</button>
+						       <span> </span>
+						       <button style={{background:'rgba(0, 0, 0, 0)'}} className="badge badge-block btn-outline-secondary" disabled="">{this.formatTime(item.mtime)}</button>			
+						        
+						    </div>
+	        	  		 </article>	                           
+                    ))}
+		    </div>		
+		
+			);
+		}		
 	}
 	else
 	{
@@ -311,8 +360,8 @@ class Assets extends Component {
               <Col sm="4" className="d-none d-sm-inline-block">
                 <ButtonToolbar className="float-left" aria-label="Toolbar with button groups">
                   <ButtonGroup className="mr-3" aria-label="First group">
-                    <Button color="outline-secondary"><i className="fa fa-th-list"></i></Button>
-                    <Button color="outline-secondary"><i className="fa fa-th-large"></i></Button>
+                    <Button onClick={() => { this.showLayout('List'); }} color="outline-secondary"><i className="fa fa-th-list"></i></Button>
+                    <Button onClick={() => { this.showLayout('Grid'); }} color="outline-secondary"><i className="fa fa-th-large"></i></Button>
                     <Button onClick={() => { this.showOptions(true); }} color="outline-secondary"><i className="fa fa-gear"></i></Button>
                   </ButtonGroup>
                 </ButtonToolbar>
@@ -579,5 +628,6 @@ class Assets extends Component {
     );
   }
 }
+
 
 export default Assets;
