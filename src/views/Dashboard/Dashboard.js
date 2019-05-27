@@ -478,7 +478,7 @@ class Dashboard extends Component {
       
     };
   }
-  NetDataHost = "http://kurrenttv.nbla.cloud:19999";
+  NetDataHost = "kurrenttv.nbla.cloud:19999";
   componentDidMount() {
   	var that = this;
   	const data = { object_type: 'asset'};  
