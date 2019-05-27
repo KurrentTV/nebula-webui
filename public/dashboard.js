@@ -5452,8 +5452,7 @@ var NETDATA = window.NETDATA || {};
                 };
             }
 
-            var s = document.getElementsByTagName('script')[0];
-            console.log(s);
+            var s = document.getElementsByTagName('script')[0];           
             s.parentNode.insertBefore(script, s);
         }
         else if(typeof callback === "function") {
@@ -5465,15 +5464,15 @@ var NETDATA = window.NETDATA || {};
     NETDATA._loadCSS = function(filename) {
         // don't use jQuery here
         // styles are loaded before jQuery
-        // to eliminate showing an unstyled page to the user
-		if(filename !== 'undefined')
+        // to eliminate showing an unstyled page to the user        
+		if(typeof filename !== 'undefined')
 		{
 			var fileref = document.createElement("link");
 	        fileref.setAttribute("rel", "stylesheet");
 	        fileref.setAttribute("type", "text/css");
 	        fileref.setAttribute("href", filename);
 
-        if (typeof fileref !== 'undefined')
+        if (typeof fileref !== undefined)
             document.getElementsByTagName("head")[0].appendChild(fileref);	
 		}
         
