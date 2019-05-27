@@ -8740,21 +8740,15 @@ var NETDATA = window.NETDATA || {};
                     return (typeof netdataNoBootstrap !== 'undefined' && netdataNoBootstrap === true);
                 }
             }
-        },*/
-    NETDATA.requiredJs = [
-       
-        {
-        	//https://fonts.googleapis.com/css?family=Lato:100,300,400,700,900|Raleway:100,200,300,400,500,600,700,800,900
-            url: '',
-            async: true,
-            isAlreadyLoaded: function() {
-                return (typeof netdataNoFontAwesome !== 'undefined' && netdataNoFontAwesome === true);
-            }
         },
         {
             url: baseURL + 'assets/site/main/js/netdata/lib/perfect-scrollbar-0.6.15.min.js',
             isAlreadyLoaded: function() { return false; }
         }
+        */
+    NETDATA.requiredJs = [       
+        
+        
     ];
 
     NETDATA.requiredCSS = [
@@ -8772,47 +8766,51 @@ var NETDATA = window.NETDATA || {};
 
     NETDATA.loadedRequiredJs = 0;
     NETDATA.loadRequiredJs = function(index, callback) {
-        if(index >= NETDATA.requiredJs.length) {
+    	if(NETDATA.requiredJs.length >= 0)
+    	{
+			 if(index >= NETDATA.requiredJs.length) {
             if(typeof callback === 'function')
                 return callback();
             return;
-        }
+	        }
 
-        if(NETDATA.requiredJs[index].isAlreadyLoaded()) {
-            NETDATA.loadedRequiredJs++;
-            NETDATA.loadRequiredJs(++index, callback);
-            return;
-        }
+	        if(NETDATA.requiredJs[index].isAlreadyLoaded()) {
+	            NETDATA.loadedRequiredJs++;
+	            NETDATA.loadRequiredJs(++index, callback);
+	            return;
+	        }
 
-        if(NETDATA.options.debug.main_loop === true)
-            console.log('loading ' + NETDATA.requiredJs[index].url);
+	        if(NETDATA.options.debug.main_loop === true)
+	            console.log('loading ' + NETDATA.requiredJs[index].url);
 
-        var async = true;
-        if(typeof NETDATA.requiredJs[index].async !== 'undefined' && NETDATA.requiredJs[index].async === false)
-            async = false;
+	        var async = true;
+	        if(typeof NETDATA.requiredJs[index].async !== 'undefined' && NETDATA.requiredJs[index].async === false)
+	            async = false;
 
-        $.ajax({
-            url: NETDATA.requiredJs[index].url,
-            cache: true,
-            dataType: "script",
-            xhrFields: { withCredentials: true } // required for the cookie
-        })
-        .done(function() {
-            if(NETDATA.options.debug.main_loop === true)
-                console.log('loaded ' + NETDATA.requiredJs[index].url);
-        })
-        .fail(function() {
-              console.log('Cannot load required JS library: ' + NETDATA.requiredJs[index].url);
-        })
-        .always(function() {
-            NETDATA.loadedRequiredJs++;
+	        $.ajax({
+	            url: NETDATA.requiredJs[index].url,
+	            cache: true,
+	            dataType: "script",
+	            xhrFields: { withCredentials: true } // required for the cookie
+	        })
+	        .done(function() {
+	            if(NETDATA.options.debug.main_loop === true)
+	                console.log('loaded ' + NETDATA.requiredJs[index].url);
+	        })
+	        .fail(function() {
+	              console.log('Cannot load required JS library: ' + NETDATA.requiredJs[index].url);
+	        })
+	        .always(function() {
+	            NETDATA.loadedRequiredJs++;
 
-            if(async === false)
-                NETDATA.loadRequiredJs(++index, callback);
-        });
+	            if(async === false)
+	                NETDATA.loadRequiredJs(++index, callback);
+	        });
 
-        if(async === true)
-            NETDATA.loadRequiredJs(++index, callback);
+	        if(async === true)
+	            NETDATA.loadRequiredJs(++index, callback);
+		}
+       
     };
 
     NETDATA.loadRequiredCSS = function(index) {
