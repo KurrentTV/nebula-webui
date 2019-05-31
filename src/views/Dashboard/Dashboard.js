@@ -517,10 +517,10 @@ class Dashboard extends Component {
       });
       
       /* set items count */
-      /*
-      NebulaApi.getAssets(bindata).then(res => {      	     	
+      
+      NebulaApi.getAssets(itemsdata).then(res => {      	     	
         this.setState({
-          itemsCount: res,
+          itemsCount: res.data.count,
           itemsCountStatus: true
         })}
        ).catch( err => {
@@ -528,7 +528,7 @@ class Dashboard extends Component {
       });
        /* set bin count */
       
-     /* NebulaApi.getAssets(bindata).then(res => {      	     	
+      NebulaApi.getAssets(bindata).then(res => {      	     	
         this.setState({
           binCounts: res.data.count,
           binCountStatus: true
@@ -537,7 +537,7 @@ class Dashboard extends Component {
         console.error(err)
       });
        /* set event count */
-      /*
+     
       NebulaApi.getAssets(eventsdata).then(res => {      	     	
         this.setState({
           eventsCount: res.data.count,
@@ -545,7 +545,7 @@ class Dashboard extends Component {
         })}
        ).catch( err => {
         console.error(err)
-      });*/
+      });
   }
   getJobTitle(cell){
   	var {assetCountStatus, assetCount, itemsCountStatus, itemsCount, binCountStatus, binCounts, eventsCountStatus, eventsCount,hideSystem ,hideCPU ,hideMemory ,
@@ -678,17 +678,59 @@ class Dashboard extends Component {
 	}
 	if(latestJobs == true)
 	{
-		_latestJobs = (
-			<BootstrapTable data={latestJobItems.data} version="4" striped hover pagination options={this.options}>
-	            <TableHeaderColumn isKey dataField="id" dataFormat={ this.getJobTitle } dataSort>Asset Title</TableHeaderColumn>
-	             <TableHeaderColumn dataField="id_action" dataFormat={ this.jobAction } >Action</TableHeaderColumn>	            
-	            <TableHeaderColumn dataField="ctime" dataFormat={ this.formatTime }>Created</TableHeaderColumn>
-	            <TableHeaderColumn dataField="stime" dataFormat={ this.formatTime }>Start Time</TableHeaderColumn>
-	            <TableHeaderColumn dataField="etime" dataFormat={ this.formatTime }>End Time</TableHeaderColumn>
-	            <TableHeaderColumn dataField="progress" dataFormat={this.progress}>Progress</TableHeaderColumn>
-	            <TableHeaderColumn dataField="message">Message</TableHeaderColumn>
-	          </BootstrapTable>
-			);
+		let _table = []
+	    for (let i = 0; i < 5; i++) {
+	      _table.push(
+	      	<tr key={i}>
+						    <td>
+						      <a href="#">{this.getJobTitle(latestJobItems.data[i].id)}</a>
+						    </td>
+						    <td>
+						      <div>{this.jobAction(latestJobItems.data[i].id_action)}</div>
+						    </td>
+						    <td>
+						      <div>{ this.formatTime(latestJobItems.data[i].ctime) }</div>
+						    </td>
+						    <td>
+						      <div>{ this.formatTime(latestJobItems.data[i].stime) }</div>
+						    </td>
+						    <td>
+						      <div>{ this.formatTime(latestJobItems.data[i].etime) }</div>
+						    </td>
+						    <td>
+						      <div className="clearfix">
+						        <div className="float-left">
+						          <strong>{latestJobItems.data[i].progress}%</strong>
+						        </div>					        
+						      </div>
+						      <Progress className="progress-xs" color="success" value={latestJobItems.data[i].progress} />
+						    </td>
+						    <td>
+						      <strong>{latestJobItems.data[i].message}</strong>
+						    </td>
+						  </tr>
+	      );
+	    }
+	    _latestJobs = (
+			<Table hover responsive className="table-outline mb-0 d-none d-sm-table">
+                  <thead className="thead-light">
+                  <tr>
+                    <th>Title</th>
+                    <th>Action</th>
+                    <th>Created</th>
+                    <th>Started</th>
+                    <th>Finished</th>
+                    <th>Progress</th>
+                    <th>Message</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  {	_table }
+                  </tbody>
+            </Table>      
+			
+			);	    
+		
 	}
 	else{
 		_latestJobs =  ( <div> Loading....</div>);
@@ -835,23 +877,23 @@ class Dashboard extends Component {
                 <Row className="text-center">
                   <Col sm={12} md className="mb-sm-2 mb-0">
                     <div className="text-muted">Assets</div>
-                    <strong>42 (40%)</strong>
-                    <Progress className="progress-xs mt-2" color="success" value="40" />
+                    <strong>{assetCount} ({assetCount}%)</strong>
+                    <Progress className="progress-xs mt-2" color="success" value={assetCount} />
                   </Col>
                   <Col sm={12} md className="mb-sm-2 mb-0 d-md-down-none">
                     <div className="text-muted">Items</div>
-                    <strong>6 (20%)</strong>
-                    <Progress className="progress-xs mt-2" color="info" value="20" />
+                    <strong>{itemsCount} ({itemsCount}%)</strong>
+                    <Progress className="progress-xs mt-2" color="info" value={itemsCount} />
                   </Col>
                   <Col sm={12} md className="mb-sm-2 mb-0">
                     <div className="text-muted">Bins</div>
-                    <strong>2 (60%)</strong>
-                    <Progress className="progress-xs mt-2" color="warning" value="60" />
+                    <strong>{binCounts} ({binCounts}%)</strong>
+                    <Progress className="progress-xs mt-2" color="warning" value={binCounts} />
                   </Col>
                   <Col sm={12} md className="mb-sm-2 mb-0">
                     <div className="text-muted">Events</div>
-                    <strong>2 (80%)</strong>
-                    <Progress className="progress-xs mt-2" color="danger" value="80" />
+                    <strong>{eventsCount} ({eventsCount}%)</strong>
+                    <Progress className="progress-xs mt-2" color="danger" value={eventsCount} />
                   </Col>
                 </Row>
               </CardFooter>
