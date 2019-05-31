@@ -81,10 +81,11 @@
 
       To begin the development, run `npm start` or `yarn start`.
       To create a production bundle, use `npm run build` or `yarn build`.
+
     -->    
      <script type="text/javascript">  
      		var netdataTheme = 'slate';     
-     </script>		
+     </script>	
     <script language="JavaScript">
 		 var randomnos = Math.ceil(Math.random() * 1000000000);
 		var mysource = "dashboard.js?v"+randomnos;
@@ -94,8 +95,8 @@
 		    document.head.appendChild(script);
 		}
 	</script>
-     <script type="text/javascript">      	
-    		NETDATA.options.current.destroy_on_hide = false;
+     <script type="text/javascript">        	
+    		NETDATA.options.current.destroy_on_hide = true;
 			// set this to false, to always show all dimensions
 			NETDATA.options.current.eliminate_zero_dimensions = true;
 			// lower the pressure on this browser

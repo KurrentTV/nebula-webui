@@ -8740,13 +8740,13 @@ var NETDATA = window.NETDATA || {};
             url: baseURL + 'assets/site/main/js/netdata/lib/perfect-scrollbar-0.6.15.min.js',
             isAlreadyLoaded: function() { return false; }
         }
+
         */
     NETDATA.requiredJs = [       
         {
             url: baseURL + 'assets/site/main/js/netdata/lib/perfect-scrollbar-0.6.15.min.js',
             isAlreadyLoaded: function() { return false; }
-        }
-        
+        }     
     ];
 
     NETDATA.requiredCSS = [
