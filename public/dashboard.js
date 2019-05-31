@@ -296,19 +296,14 @@ var NETDATA = window.NETDATA || {};
             grid: '#283236',
             axis: '#283236',
             highlight: '#383838',
-/*          colors: [   '#55bb33', '#ff2222',   '#0099C6', '#faa11b',   '#adbce0', '#DDDD00',
-                        '#4178ba', '#f58122',   '#a5cc39', '#f58667',   '#f5ef89', '#cf93c0',
-                        '#a5d18a', '#b8539d',   '#3954a3', '#c8a9cf',   '#c7de8a', '#fad20a',
-                        '#a6a479', '#a66da8' ],
-*/
             colors: [   '#66AA00', '#FE3912',   '#3366CC', '#D66300',   '#0099C6', '#DDDD00',
                         '#5054e6', '#EE9911',   '#BB44CC', '#e45757',   '#ef0aef', '#CC7700',
                         '#22AA99', '#109618',   '#905bfd', '#f54882',   '#4381bf', '#ff3737',
                         '#329262', '#3B3EFF' ],
-            easypiechart_track: '#373b40',
-            easypiechart_scale: '#373b40',
+            easypiechart_track: '#3A4149',
+            easypiechart_scale: '#3A4149',
             gauge_pointer: '#474b50',
-            gauge_stroke: '#373b40',
+            gauge_stroke: '#3A4149',
             gauge_gradient: false,
             d3pie: {
                 title: '#C8C8C8',
@@ -5452,7 +5447,7 @@ var NETDATA = window.NETDATA || {};
                 };
             }
 
-            var s = document.getElementsByTagName('script')[0];
+            var s = document.getElementsByTagName('script')[0];           
             s.parentNode.insertBefore(script, s);
         }
         else if(typeof callback === "function") {
@@ -5464,15 +5459,18 @@ var NETDATA = window.NETDATA || {};
     NETDATA._loadCSS = function(filename) {
         // don't use jQuery here
         // styles are loaded before jQuery
-        // to eliminate showing an unstyled page to the user
+        // to eliminate showing an unstyled page to the user        
+		if(typeof filename !== 'undefined')
+		{
+			var fileref = document.createElement("link");
+	        fileref.setAttribute("rel", "stylesheet");
+	        fileref.setAttribute("type", "text/css");
+	        fileref.setAttribute("href", filename);
 
-        var fileref = document.createElement("link");
-        fileref.setAttribute("rel", "stylesheet");
-        fileref.setAttribute("type", "text/css");
-        fileref.setAttribute("href", filename);
-
-        if (typeof fileref !== 'undefined')
-            document.getElementsByTagName("head")[0].appendChild(fileref);
+        if (typeof fileref !== undefined)
+            document.getElementsByTagName("head")[0].appendChild(fileref);	
+		}
+        
     };
 
     NETDATA.colorHex2Rgb = function(hex) {
@@ -8726,23 +8724,38 @@ var NETDATA = window.NETDATA || {};
 
     // ----------------------------------------------------------------------------------------------------------------
     // Load required JS libraries and CSS
-
-    NETDATA.requiredJs = [
-       
-        
+/* {
+            url: baseURL + 'assets/site/main/js/netdata/lib/bootstrap-3.3.7.min.js',
+            async: false,
+            isAlreadyLoaded: function() {
+                // check if bootstrap is loaded
+                if(typeof $().emulateTransitionEnd === 'function')
+                    return true;
+                else {
+                    return (typeof netdataNoBootstrap !== 'undefined' && netdataNoBootstrap === true);
+                }
+            }
+        },
         {
             url: baseURL + 'assets/site/main/js/netdata/lib/perfect-scrollbar-0.6.15.min.js',
             isAlreadyLoaded: function() { return false; }
         }
+        */
+    NETDATA.requiredJs = [       
+        {
+            url: baseURL + 'assets/site/main/js/netdata/lib/perfect-scrollbar-0.6.15.min.js',
+            isAlreadyLoaded: function() { return false; }
+        }
+        
     ];
-/*{
+
+    NETDATA.requiredCSS = [
+        {
             url: NETDATA.themes.current.bootstrap_css,
             isAlreadyLoaded: function() {
                 return (typeof netdataNoBootstrap !== 'undefined' && netdataNoBootstrap === true);
             }
-        },*/
-    NETDATA.requiredCSS = [
-        
+        },
         {
             url: NETDATA.themes.current.dashboard_css,
             isAlreadyLoaded: function() { return false; }
@@ -8751,47 +8764,51 @@ var NETDATA = window.NETDATA || {};
 
     NETDATA.loadedRequiredJs = 0;
     NETDATA.loadRequiredJs = function(index, callback) {
-        if(index >= NETDATA.requiredJs.length) {
+    	if(NETDATA.requiredJs.length >= 0)
+    	{
+			 if(index >= NETDATA.requiredJs.length) {
             if(typeof callback === 'function')
                 return callback();
             return;
-        }
+	        }
 
-        if(NETDATA.requiredJs[index].isAlreadyLoaded()) {
-            NETDATA.loadedRequiredJs++;
-            NETDATA.loadRequiredJs(++index, callback);
-            return;
-        }
+	        if(NETDATA.requiredJs[index].isAlreadyLoaded()) {
+	            NETDATA.loadedRequiredJs++;
+	            NETDATA.loadRequiredJs(++index, callback);
+	            return;
+	        }
 
-        if(NETDATA.options.debug.main_loop === true)
-            console.log('loading ' + NETDATA.requiredJs[index].url);
+	        if(NETDATA.options.debug.main_loop === true)
+	            console.log('loading ' + NETDATA.requiredJs[index].url);
 
-        var async = true;
-        if(typeof NETDATA.requiredJs[index].async !== 'undefined' && NETDATA.requiredJs[index].async === false)
-            async = false;
+	        var async = true;
+	        if(typeof NETDATA.requiredJs[index].async !== 'undefined' && NETDATA.requiredJs[index].async === false)
+	            async = false;
 
-        $.ajax({
-            url: NETDATA.requiredJs[index].url,
-            cache: true,
-            dataType: "script",
-            xhrFields: { withCredentials: true } // required for the cookie
-        })
-        .done(function() {
-            if(NETDATA.options.debug.main_loop === true)
-                console.log('loaded ' + NETDATA.requiredJs[index].url);
-        })
-        .fail(function() {
-              console.log('Cannot load required JS library: ' + NETDATA.requiredJs[index].url);
-        })
-        .always(function() {
-            NETDATA.loadedRequiredJs++;
+	        $.ajax({
+	            url: NETDATA.requiredJs[index].url,
+	            cache: true,
+	            dataType: "script",
+	            xhrFields: { withCredentials: true } // required for the cookie
+	        })
+	        .done(function() {
+	            if(NETDATA.options.debug.main_loop === true)
+	                console.log('loaded ' + NETDATA.requiredJs[index].url);
+	        })
+	        .fail(function() {
+	              console.log('Cannot load required JS library: ' + NETDATA.requiredJs[index].url);
+	        })
+	        .always(function() {
+	            NETDATA.loadedRequiredJs++;
 
-            if(async === false)
-                NETDATA.loadRequiredJs(++index, callback);
-        });
+	            if(async === false)
+	                NETDATA.loadRequiredJs(++index, callback);
+	        });
 
-        if(async === true)
-            NETDATA.loadRequiredJs(++index, callback);
+	        if(async === true)
+	            NETDATA.loadRequiredJs(++index, callback);
+		}
+       
     };
 
     NETDATA.loadRequiredCSS = function(index) {
@@ -9488,5 +9505,4 @@ var NETDATA = window.NETDATA || {};
         });
     });
 })(window, document, (typeof jQuery === 'function')?jQuery:undefined);
-
 

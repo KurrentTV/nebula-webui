@@ -246,7 +246,7 @@ class Assets extends Component {
 		else if(layout == 'Grid')
 		{
 			_tableData = (			
-			<div className="react-bs-table-container" style={{overflow:'hidden'}} id="app-card-list">		        
+			<div className="react-bs-table-container" style={{overflow:'hidden',border:'1px solid #23282c',paddingTop:'1rem'}} id="app-card-list">		        
 	        	  {items.data.map(item =>(
 	        	  		 <article key={item.id} className="card-grid">		
 						    <div style={{position:'relative'}} className="card-grid-header">	

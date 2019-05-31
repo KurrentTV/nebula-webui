@@ -1,5 +1,6 @@
 import React, { Component, lazy, Suspense } from 'react';
 import { Bar, Line } from 'react-chartjs-2';
+import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
 import {
   Badge,
   Button,
@@ -463,8 +464,12 @@ class Dashboard extends Component {
 
     this.toggle = this.toggle.bind(this);
     this.onRadioBtnClick = this.onRadioBtnClick.bind(this);
-
+ 	this.showCharts = this.showCharts.bind(this);
+ 	this.getJobTitle = this.getJobTitle.bind(this);
     this.state = {
+      assets: [],
+      latestJobs: false,
+      latestJobItems: [],
       dropdownOpen: false,
       radioSelected: 2,
       assetCountStatus: false,
@@ -474,7 +479,13 @@ class Dashboard extends Component {
       binCountStatus: false,
       binCounts: 0,
       eventsCountStatus: false,
-      eventsCount: 0
+      eventsCount: 0,
+      hideSystem: false,
+      hideCPU: true,
+      hideMemory: true,
+      hideDisk: true,
+      hideNetwork: true,
+      hideService: true
       
     };
   }
@@ -485,11 +496,21 @@ class Dashboard extends Component {
   	const itemsdata = { object_type: 'item'};
   	const bindata = { object_type: 'bin'};
   	const eventsdata = { object_type: 'event'};
-  	
+  	const jobs = {view:'finished'}
   	NebulaApi.getAssets(data).then(res => {      	     	
         this.setState({
           assetCount: res.data.count,
-          assetCountStatus: true
+          assetCountStatus: true,
+          assets: res.data
+        })}
+       ).catch( err => {
+        console.error(err)
+      });
+      
+      NebulaApi.getLatestJobs(jobs).then(res => {      	     	
+        this.setState({
+          latestJobItems: res.data,
+          latestJobs: true
         })}
        ).catch( err => {
         console.error(err)
@@ -525,13 +546,114 @@ class Dashboard extends Component {
        ).catch( err => {
         console.error(err)
       });*/
-  }	 
+  }
+  getJobTitle(cell){
+  	var {assetCountStatus, assetCount, itemsCountStatus, itemsCount, binCountStatus, binCounts, eventsCountStatus, eventsCount,hideSystem ,hideCPU ,hideMemory ,
+      hideDisk,hideNetwork,hideService, latestJobs, latestJobItems,assets} = this.state; 
+     var _title = '';
+  	 if(assetCountStatus == true)
+  	 {  	 	
+      const items = assets.data.map((item, key) =>{
+      		  if(key == cell) {_title = item.title;}
+      		}
+	    );
+	 }
+	 return _title;	
+  } 
   toggle() {
     this.setState({
       dropdownOpen: !this.state.dropdownOpen,
     });
   }
-
+   showCharts(_type) {
+	switch(_type)
+	{
+		case "System":
+   		this.setState({
+	      hideSystem: false,
+	      hideCPU: true,
+	      hideMemory: true,
+	      hideDisk: true,
+	      hideNetwork: true,
+	      hideService: true,
+	    });	
+		break;
+		case "CPU":	
+		this.setState({
+	      hideSystem: true,
+	      hideCPU: false,
+	      hideMemory: true,
+	      hideDisk: true,
+	      hideNetwork: true,
+	      hideService: true,
+	    });	
+		break;
+		case "Memory":	
+		this.setState({
+	      hideSystem: true,
+	      hideCPU: true,
+	      hideMemory: false,
+	      hideDisk: true,
+	      hideNetwork: true,
+	      hideService: true,
+	    });	
+		break;
+		case "Disk":
+		this.setState({
+	      hideSystem: true,
+	      hideCPU: true,
+	      hideMemory: true,
+	      hideDisk: false,
+	      hideNetwork: true,
+	      hideService: true,
+	    });			
+		break;
+		case "Network":		
+		this.setState({
+	      hideSystem: true,
+	      hideCPU: true,
+	      hideMemory: true,
+	      hideDisk: true,
+	      hideNetwork: false,
+	      hideService: true,
+	    });
+		break;
+		case "Service":		
+		this.setState({
+	      hideSystem: true,
+	      hideCPU: true,
+	      hideMemory: true,
+	      hideDisk: true,
+	      hideNetwork: true,
+	      hideService: false,
+	    });
+		break;
+	}
+  }
+  progress(cell)
+  {
+  	return (
+  		<div>
+  		<strong>({cell}%)</strong>
+        <Progress className="progress-xs mt-2" color="success" value={cell} />
+        </div>
+  	 )
+  }
+  jobAction(cell)
+  {
+  	return 'Proxy';
+  }
+  formatTime(cell){
+  	var date = new Date(cell*1000);  
+  	var d = date.getDay();
+  	var m = date.getMonth();
+  	var y = date.getFullYear();
+	var hours = date.getHours();
+	var minutes = "0" + date.getMinutes();
+	var seconds = "0" + date.getSeconds();
+	var formattedTime = y + '-' + m + '-' + d + ' ' + hours + ':' + minutes.substr(-2);
+	return formattedTime;
+  }
   onRadioBtnClick(radioSelected) {
     this.setState({
       radioSelected: radioSelected,
@@ -541,11 +663,35 @@ class Dashboard extends Component {
   loading = () => <div className="animated fadeIn pt-1 text-center">Loading...</div>
 
   render() {
-	var {assetCountStatus, assetCount, itemsCountStatus, itemsCount, binCountStatus, binCounts, eventsCountStatus, eventsCount} = this.state;
+	var {assetCountStatus, assetCount, itemsCountStatus, itemsCount, binCountStatus, binCounts, eventsCountStatus, eventsCount,hideSystem ,hideCPU ,hideMemory ,
+      hideDisk,hideNetwork,hideService, latestJobs, latestJobItems,assets} = this.state;
+	let _latestJobs;
 	var netdataStyle = {
 		marginRight:'10px',
 		width:'11%',
 		willchange: 'transform'
+	}
+	var btnStyle = {
+		background:'#3A4149',
+		border:'none',
+		color:'#73818f'
+	}
+	if(latestJobs == true)
+	{
+		_latestJobs = (
+			<BootstrapTable data={latestJobItems.data} version="4" striped hover pagination options={this.options}>
+	            <TableHeaderColumn isKey dataField="id" dataFormat={ this.getJobTitle } dataSort>Asset Title</TableHeaderColumn>
+	             <TableHeaderColumn dataField="id_action" dataFormat={ this.jobAction } >Action</TableHeaderColumn>	            
+	            <TableHeaderColumn dataField="ctime" dataFormat={ this.formatTime }>Created</TableHeaderColumn>
+	            <TableHeaderColumn dataField="stime" dataFormat={ this.formatTime }>Start Time</TableHeaderColumn>
+	            <TableHeaderColumn dataField="etime" dataFormat={ this.formatTime }>End Time</TableHeaderColumn>
+	            <TableHeaderColumn dataField="progress" dataFormat={this.progress}>Progress</TableHeaderColumn>
+	            <TableHeaderColumn dataField="message">Message</TableHeaderColumn>
+	          </BootstrapTable>
+			);
+	}
+	else{
+		_latestJobs =  ( <div> Loading....</div>);
 	}
     return (
       <div className="animated fadeIn">
@@ -655,114 +801,7 @@ class Dashboard extends Component {
                 Latest Jobs
               </CardHeader>
               <CardBody>
-                <Table hover responsive className="table-outline mb-0 d-none d-sm-table">
-                  <thead className="thead-light">
-                  <tr>
-                    <th>Title</th>
-                    <th>Action</th>
-                    <th>Created</th>
-                    <th>Started</th>
-                    <th>Finished</th>
-                    <th>Progress</th>
-                    <th>Message</th>
-                  </tr>
-                  </thead>
-                  <tbody>
-                  <tr>
-                    <td>
-                      <a href="#">trip_to_the_moon</a>
-                    </td>
-                    <td>
-                      <div>Proxy</div>
-                    </td>
-                    <td>
-                      <div>2019-05-06 21:30:44</div>
-                    </td>
-                    <td>
-                      <div>2019-05-06 21:30:48</div>
-                    </td>
-                    <td>
-                      <div></div>
-                    </td>
-                    <td>
-                      <div className="clearfix">
-                        <div className="float-left">
-                          <strong>50%</strong>
-                        </div>
-                        <div className="float-right">
-                          <small className="text-muted">2019-05-06 21:32:55</small>
-                        </div>
-                      </div>
-                      <Progress className="progress-xs" color="success" value="50" />
-                    </td>
-                    <td>
-                      <strong>In Progress</strong>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <a href="#">schroedingers_room</a>
-                    </td>
-                    <td>
-                      <div>Proxy</div>
-                    </td>
-                    <td>
-                      <div>2019-05-02 11:11:51</div>
-                    </td>
-                    <td>
-                      <div>2019-05-02 11:15:24</div>
-                    </td>
-                    <td>
-                      <div>2019-05-02 11:17:28</div>
-                    </td>
-                    <td>
-                      <div className="clearfix">
-                        <div className="float-left">
-                          <strong>100%</strong>
-                        </div>
-                        <div className="float-right">
-                          <small className="text-muted">2019-05-02 11:17:28</small>
-                        </div>
-                      </div>
-                      <Progress className="progress-xs" color="success" value="100" />
-                    </td>
-                    <td>
-                      <strong>Finished in 2 minutes (4.98x realtime)</strong>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <a href="#">schroedingers_room</a>
-                    </td>
-                    <td>
-                      <div>Proxy</div>
-                    </td>
-                    <td>
-                      <div>2019-05-02 11:11:51</div>
-                    </td>
-                    <td>
-                      <div>2019-05-02 11:15:24</div>
-                    </td>
-                    <td>
-                      <div>2019-05-02 11:17:28</div>
-                    </td>
-                    <td>
-                      <div className="clearfix">
-                        <div className="float-left">
-                          <strong>100%</strong>
-                        </div>
-                        <div className="float-right">
-                          <small className="text-muted">2019-05-02 11:17:28</small>
-                        </div>
-                      </div>
-                      <Progress className="progress-xs" color="danger" value="100" />
-                    </td>
-                    <td>
-                      <strong>Failed</strong>
-                    </td>
-                  </tr>
-                  </tbody>
-                </Table>
+                {_latestJobs}
               </CardBody>
             </Card>
           </Col>
@@ -824,115 +863,135 @@ class Dashboard extends Component {
         <Col>
           <Card>
             <CardBody>
-              <Row>
+              <Row>              	
                 <Col sm="2">
-                  <CardTitle className="mb-0">System</CardTitle>
+                  <CardTitle className="mb-0"><button onClick={() => { this.showCharts('System'); }} className="btn btn-secondary" style={btnStyle}>System</button></CardTitle>
                   <div className="small text-muted">Overview of the key system metrics.</div>
                 </Col>
                 <Col sm="2">
-                  <CardTitle className="mb-0">CPUs</CardTitle>
+                  <CardTitle className="mb-0"><button onClick={() => { this.showCharts('CPU'); }} className="btn btn-secondary" style={btnStyle}>CPUs</button></CardTitle>
                 </Col>
                 <Col sm="2">
-                  <CardTitle className="mb-0">Memory</CardTitle>
+                  <CardTitle className="mb-0"><button onClick={() => { this.showCharts('Memory'); }} className="btn btn-secondary" style={btnStyle}>Memory</button></CardTitle>
                 </Col>
                 <Col sm="2">
-                  <CardTitle className="mb-0">Disks</CardTitle>
+                  <CardTitle className="mb-0"><button onClick={() => { this.showCharts('Disk'); }} className="btn btn-secondary" style={btnStyle}>Disks</button></CardTitle>
                 </Col>
                 <Col sm="2">
-                  <CardTitle className="mb-0">Networking Stack</CardTitle>
+                  <CardTitle className="mb-0"><button onClick={() => { this.showCharts('Network'); }} className="btn btn-secondary" style={btnStyle}>Networking Stack</button></CardTitle>
                 </Col>
                 <Col sm="2">
-                  <CardTitle className="mb-0">Services</CardTitle>
+                  <CardTitle className="mb-0"><button onClick={() => { this.showCharts('Service'); }} className="btn btn-secondary" style={btnStyle}>Services</button></CardTitle>
                 </Col>
               </Row>
             </CardBody>
             <CardFooter>
               <Row className="text-center">
               	<div style={{width:'100%',maxHeight:'calc(100% - 15px)',textAlign:'center', display:'inline-block'}}>
-					<div style={{width:'100%', height:'100%', align:'center', display:'inline-block'}}>
-	                
-               <div className="netdata-container-easypiechart" style={{marginRight:'11px'}} data-netdata="system.io" data-host={this.NetDataHost} data-dimensions="in"
-									    data-chart-library="easypiechart"
-									    data-title="Disk Read"
-									    data-width="10%"
-									    data-before="0"
-									    data-after="-420"
-									    data-points="420"
-									    data-common-units="system.io.mainhead"
-									    role="application">
-									</div>
-									<div className="netdata-container-easypiechart" style={{marginRight:'11px'}} data-netdata="system.io" data-host={this.NetDataHost}
-									    data-dimensions="out"
-									    data-chart-library="easypiechart"
-									    data-title="Disk Write"
-									    data-width="10%"
-									    data-before="0"
-									    data-after="-420"
-									    data-points="420"
-									    data-common-units="system.io.mainhead"
-									    role="application">
-									</div>
-									<div data-netdata="disk_space._"
-									data-host={this.NetDataHost}
-									    data-decimal-digits="0"
-									    data-title="Available Disk"
-									    data-dimensions="avail"
-									    data-chart-library="easypiechart"
-									    data-easypiechart-max-value="100"
-									    data-common-max="avail"
-									    data-width="11%"
-									    data-height="100%"
-									    data-after="-420"
-									    data-points="420"
-									    role="application">
-									    </div>
-									<div className="netdata-container-gauge" style={{marginRight:'11px'}} data-netdata="system.cpu"  data-host={this.NetDataHost}
-									    data-chart-library="gauge"
-									    data-title="CPU"
-									    data-units="%"
-									    data-gauge-max-value="100"
-									    data-width="20%"
-									    data-after="-420"
-									    data-points="420"
-									    data-colors="#22AA99"
-									    role="application">
-									</div>
-									<div className="netdata-container-easypiechart" style={netdataStyle} data-netdata="system.ram" data-host={this.NetDataHost}
-									    data-dimensions="used|buffers|active|wired"
-									    data-append-options="percentage"
-									    data-chart-library="easypiechart"
-									    data-title="Used RAM"
-									    data-units="%"
-									    data-easypiechart-max-value="100"
-									    data-width="11%"
-									    data-after="-420"
-									    data-points="420"
-									    data-colors="#EE9911"
-									    role="application">
-									</div>
-									<div className="netdata-container-easypiechart" style={netdataStyle} data-netdata="system.net" data-host={this.NetDataHost}
-									    data-dimensions="received"
-									    data-chart-library="easypiechart"
-									    data-title="Net Inbound"
-									    data-width="10%"
-									    data-before="0"
-									    data-after="-420"
-									    data-points="420"
-									    data-common-units="system.net.mainhead"
-									    role="application">
-									</div>
-									<div className="netdata-container-easypiechart" style={netdataStyle} data-netdata="system.net" data-host={this.NetDataHost}
-									    data-dimensions="sent"
-									    data-chart-library="easypiechart"
-									    data-title="Net Outbound" data-width="10%"
-									    data-before="0"
-									    data-after="-420"
-									    data-points="420"
-									    data-common-units="system.net.mainhead"
-									    role="application">
-									</div>
-									</div>
-									</div>
+					<div style={{width:'100%', height:'100%', align:'center'}} className={hideSystem ? 'hidden' : ''}>	                
+		               <div className="netdata-container-easypiechart" style={{marginRight:'11px'}} data-netdata="system.io" data-host={this.NetDataHost} 
+		               		data-dimensions="in"
+						    data-chart-library="easypiechart"
+						    data-title="Disk Read"
+						    data-width="10%"
+						    data-before="0"
+						    data-after="-420"
+						    data-points="420"
+						    data-common-units="system.io.mainhead"
+						    role="application">
+						</div>
+						<div className="netdata-container-easypiechart" style={{marginRight:'11px'}} data-netdata="system.io" data-host={this.NetDataHost}
+						    data-dimensions="out"
+						    data-chart-library="easypiechart"
+						    data-title="Disk Write"
+						    data-width="10%"
+						    data-before="0"
+						    data-after="-420"
+						    data-points="420"
+						    data-common-units="system.io.mainhead"
+						    role="application">
+						</div>
+						<div data-netdata="disk_space._"
+						data-host={this.NetDataHost}
+						    data-decimal-digits="0"
+						    data-title="Available Disk"
+						    data-dimensions="avail"
+						    data-chart-library="easypiechart"
+						    data-easypiechart-max-value="100"
+						    data-common-max="avail"
+						    data-width="11%"
+						    data-height="100%"
+						    data-after="-420"
+						    data-points="420"
+						    role="application">
+						    </div>
+						<div className="netdata-container-gauge" style={{marginRight:'11px'}} data-netdata="system.cpu"  data-host={this.NetDataHost}
+						    data-chart-library="gauge"
+						    data-title="CPU"
+						    data-units="%"
+						    data-gauge-max-value="100"
+						    data-width="20%"
+						    data-after="-420"
+						    data-points="420"
+						    data-colors="#22AA99"
+						    role="application">
+						</div>
+						<div className="netdata-container-easypiechart" style={netdataStyle} data-netdata="system.ram" data-host={this.NetDataHost}
+						    data-dimensions="used|buffers|active|wired"
+						    data-append-options="percentage"
+						    data-chart-library="easypiechart"
+						    data-title="Used RAM"
+						    data-units="%"
+						    data-easypiechart-max-value="100"
+						    data-width="11%"
+						    data-after="-420"
+						    data-points="420"
+						    data-colors="#EE9911"
+						    role="application">
+						</div>
+						<div className="netdata-container-easypiechart" style={netdataStyle} data-netdata="system.net" data-host={this.NetDataHost}
+						    data-dimensions="received"
+						    data-chart-library="easypiechart"
+						    data-title="Net Inbound"
+						    data-width="10%"
+						    data-before="0"
+						    data-after="-420"
+						    data-points="420"
+						    data-common-units="system.net.mainhead"
+						    role="application">
+						</div>
+						<div className="netdata-container-easypiechart" style={netdataStyle} data-netdata="system.net" data-host={this.NetDataHost}
+						    data-dimensions="sent"
+						    data-chart-library="easypiechart"
+						    data-title="Net Outbound" data-width="10%"
+						    data-before="0"
+						    data-after="-420"
+						    data-points="420"
+						    data-common-units="system.net.mainhead"
+						    role="application">
+						</div>
+				</div>
+					<div  style={{width:'100%', height:'100%', align:'center'}} className={hideCPU ? 'hidden' : ''}>
+						<div data-host={this.NetDataHost} className="netdata-container-with-legend" id="chart_system_cpu" data-netdata="system.cpu" data-width="100%" data-height="180px" data-dygraph-valuerange="[0, 100]" data-before="0" data-after="-420" data-id="neb-cor-01_system_cpu" data-colors="" data-decimal-digits="-1" role="application" style={{width:'100%',height:'180px'}}>	
+						</div>				
+					</div>
+					<div  style={{width:'100%', height:'100%', align:'center'}} className={hideMemory ? 'hidden' : ''}>	 
+					   <div data-host={this.NetDataHost} className="netdata-container-with-legend" id="chart_system_ram" data-netdata="system.ram" data-width="100%" data-height="180px" data-dygraph-valuerange="[null, null]" data-before="0" data-after="-420" data-id="neb-cor-01_system_ram" data-colors="" data-decimal-digits="-1" role="application" style={{width:'100%',height:'180px'}}>	   
+						</div>				
+					</div>
+					<div  style={{width:'100%', height:'100%', align:'center'}} className={hideDisk ? 'hidden' : ''}>	 
+					   <div data-host={this.NetDataHost} className="netdata-container-with-legend" id="chart_system_io" data-netdata="system.io" data-width="100%" data-height="180px" data-dygraph-valuerange="[null, null]" data-before="0" data-after="-420" data-id="neb-cor-01_system_io" data-colors="" data-decimal-digits="-1" role="application" style={{width:'100%',height:'180px'}}>	   
+						</div>				
+					</div>
+					<div  style={{width:'100%', height:'100%', align:'center'}} className={hideNetwork ? 'hidden' : ''}>	 
+					  <div data-host={this.NetDataHost} className="netdata-container-with-legend" id="chart_system_net" data-netdata="system.net" data-width="100%" data-height="180px" data-dygraph-valuerange="[null, null]" data-before="0" data-after="-420" data-id="neb-cor-01_system_net" data-colors="" data-decimal-digits="-1" role="application" style={{width:'100%',height:'180px'}}>	   
+						</div>				
+					</div>
+					<div  style={{width:'100%', height:'100%', align:'center'}} className={hideService ? 'hidden' : ''}>	 
+					   <div data-host={this.NetDataHost} className="netdata-container-with-legend" id="chart_services_cpu" data-netdata="services.cpu" data-width="100%" data-height="180px" data-dygraph-valuerange="[null, null]" data-before="0" data-after="-420" data-id="neb-cor-01_services_cpu" data-colors="" data-decimal-digits="-1" role="application" style={{width:'100%',height:'180px'}}>	   
+						</div>				
+					</div>
+				</div>
               </Row>
             </CardFooter>
           </Card>
