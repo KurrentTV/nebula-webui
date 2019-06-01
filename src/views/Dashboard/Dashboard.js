@@ -907,30 +907,30 @@ class Dashboard extends Component {
             <CardBody>
               <Row>              	
                 <Col sm="2">
-                  <CardTitle className="mb-0"><button onClick={() => { this.showCharts('System'); }} className="btn btn-secondary" style={btnStyle}>System</button></CardTitle>
+                  <CardTitle className="mb-0"><button onClick={() => { this.showCharts('System'); }} className="btn btn-secondary netdatabutton" style={btnStyle}>System</button></CardTitle>
                   
                 </Col>
                 <Col sm="2">
-                  <CardTitle className="mb-0"><button onClick={() => { this.showCharts('CPU'); }} className="btn btn-secondary" style={btnStyle}>CPUs</button></CardTitle>
+                  <CardTitle className="mb-0"><button onClick={() => { this.showCharts('CPU'); }} className="btn btn-secondary netdatabutton" style={btnStyle}>CPUs</button></CardTitle>
                 </Col>
                 <Col sm="2">
-                  <CardTitle className="mb-0"><button onClick={() => { this.showCharts('Memory'); }} className="btn btn-secondary" style={btnStyle}>Memory</button></CardTitle>
+                  <CardTitle className="mb-0"><button onClick={() => { this.showCharts('Memory'); }} className="btn btn-secondary netdatabutton" style={btnStyle}>Memory</button></CardTitle>
                 </Col>
                 <Col sm="2">
-                  <CardTitle className="mb-0"><button onClick={() => { this.showCharts('Disk'); }} className="btn btn-secondary" style={btnStyle}>Disks</button></CardTitle>
+                  <CardTitle className="mb-0"><button onClick={() => { this.showCharts('Disk'); }} className="btn btn-secondary netdatabutton" style={btnStyle}>Disks</button></CardTitle>
                 </Col>
                 <Col sm="2">
-                  <CardTitle className="mb-0"><button onClick={() => { this.showCharts('Network'); }} className="btn btn-secondary" style={btnStyle}>Networking Stack</button></CardTitle>
+                  <CardTitle className="mb-0"><button onClick={() => { this.showCharts('Network'); }} className="btn btn-secondary netdatabutton" style={btnStyle}>Networking Stack</button></CardTitle>
                 </Col>
                 <Col sm="2">
-                  <CardTitle className="mb-0"><button onClick={() => { this.showCharts('Service'); }} className="btn btn-secondary" style={btnStyle}>Services</button></CardTitle>
+                  <CardTitle className="mb-0"><button onClick={() => { this.showCharts('Service'); }} className="btn btn-secondary netdatabutton" style={btnStyle}>Services</button></CardTitle>
                 </Col>
               </Row>
             </CardBody>
             <CardFooter style={{background:'#3A4149'}}>
               <Row className="text-center">
               	<div style={{width:'100%',maxHeight:'calc(100% - 15px)',textAlign:'center', display:'inline-block'}}>
-					<div style={{width:'100%', height:'100%', align:'center'}} className={hideSystem ? 'hidden' : ''}>	                
+					<div style={{width:'100%', height:'100%', align:'center'}} className={hideSystem ? 'hidden' : ''}>	                	<div className="dygraph-label dygraph-title" style={{position:'relative'}}>Overview of the key system metrics</div>
 		               <div className="netdata-container-easypiechart" style={{marginRight:'11px'}} data-netdata="system.io" data-host={this.NetDataHost} 
 		               		data-dimensions="in"
 						    data-chart-library="easypiechart"
