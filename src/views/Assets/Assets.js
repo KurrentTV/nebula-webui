@@ -246,29 +246,39 @@ class Assets extends Component {
 		else if(layout == 'Grid')
 		{
 			_tableData = (			
-			<div className="react-bs-table-container" style={{overflow:'hidden',border:'1px solid #23282c',paddingTop:'1rem'}} id="app-card-list">		        
+			<div className="row">		        
 	        	  {items.data.map(item =>(
-	        	  		 <article key={item.id} className="card-grid">		
-						    <div style={{position:'relative'}} className="card-grid-header">	
-						    	<img style={style} src="/assets/img/hqdefault.jpg" alt="boohoo" className="img-responsive"/>
-						    	<i style={stImg} className="fa fa-play-circle"></i>					        
-						    </div>
-						    <div className="card-grid-body">
-						     <h4 className="card-grid-title">{this.subTitleFormat(item.title)}</h4>	
-						     <i className="fa fa-circle text-success"></i>
-						     <span> </span>
-						     	<i className="fa fa-flag text-danger"></i>
-						     	<span> </span>
-						       {this.folderName(item.id_folder)} 
-						       <span> </span>
-						       <button style={{background:'rgba(0, 0, 0, 0)'}} className="badge badge-block btn-outline-secondary" disabled="">{this.secondsToHms(item.duration)}</button>
-						       <span> </span>
-						       <button style={{background:'rgba(0, 0, 0, 0)'}} className="badge badge-block btn-outline-secondary" disabled="">{this.formatTime(item.ctime)}</button>
-						       <span> </span>
-						       <button style={{background:'rgba(0, 0, 0, 0)'}} className="badge badge-block btn-outline-secondary" disabled="">{this.formatTime(item.mtime)}</button>			
-						        
-						    </div>
-	        	  		 </article>	                           
+	        	  
+	        	  		<Col xl="2" md="4" sm="6" xs="12" className="mb-4">
+	        	  			<table className="w-100">
+						        <tbody>
+						        <tr key={item.id}>
+						        <div style={{ position:'relative' }}>
+						        <img style={{ width: '100%'}} src={'/assets/img/hqdefault.jpg'} alt="boohoo" className="img-responsive"/>
+						         <i style={{ position:'absolute' ,top:'50%' ,left:'50%' ,fontSize:'50px' ,margin:'-25px 0 0 -20px'}} className="fa fa-play-circle"></i>
+						         </div>
+						        <h5>{this.subTitleFormat(item.title)}</h5>
+						          <i className="fa fa-circle text-success" />
+						          <span>  </span>
+						          <i className="fa fa-flag text-danger" />
+						          <span>  </span>
+						          <button className="badge badge-block btn-primary" disabled>{this.folderName(item.id_folder)} </button>
+						          <span>  </span>
+						          <button className="badge badge-block btn-outline-secondary" disabled>{this.secondsToHms(item.duration)}</button>
+						          <span>  </span>
+						          <button className="badge badge-block btn-outline-secondary" disabled>163.64GB</button>
+						          <span>  </span>
+						          <button className="badge badge-block btn-outline-secondary" disabled>25FPS</button>
+						          <span>  </span>
+						          <button className="badge badge-block btn-outline-secondary" disabled>DNXHD</button>
+						          <span>  </span>
+						          <button className="badge badge-block btn-outline-secondary" disabled>1920x1080</button>
+						        </tr>
+						        </tbody>
+						      </table>
+	        	  		
+	        	  		</Col>
+	        	  		                          
                     ))}
 		    </div>		
 		

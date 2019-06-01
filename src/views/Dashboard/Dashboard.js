@@ -489,7 +489,7 @@ class Dashboard extends Component {
       
     };
   }
-  NetDataHost = "kurrenttv.nbla.cloud:19999";
+  NetDataHost = "https://kurrenttv.nbla.cloud:3800";
   componentDidMount() {
   	var that = this;
   	const data = { object_type: 'asset'};  
@@ -908,7 +908,7 @@ class Dashboard extends Component {
               <Row>              	
                 <Col sm="2">
                   <CardTitle className="mb-0"><button onClick={() => { this.showCharts('System'); }} className="btn btn-secondary" style={btnStyle}>System</button></CardTitle>
-                  <div className="small text-muted">Overview of the key system metrics.</div>
+                  
                 </Col>
                 <Col sm="2">
                   <CardTitle className="mb-0"><button onClick={() => { this.showCharts('CPU'); }} className="btn btn-secondary" style={btnStyle}>CPUs</button></CardTitle>
@@ -927,7 +927,7 @@ class Dashboard extends Component {
                 </Col>
               </Row>
             </CardBody>
-            <CardFooter>
+            <CardFooter style={{background:'#3A4149'}}>
               <Row className="text-center">
               	<div style={{width:'100%',maxHeight:'calc(100% - 15px)',textAlign:'center', display:'inline-block'}}>
 					<div style={{width:'100%', height:'100%', align:'center'}} className={hideSystem ? 'hidden' : ''}>	                
@@ -1014,23 +1014,23 @@ class Dashboard extends Component {
 						</div>
 				</div>
 					<div  style={{width:'100%', height:'100%', align:'center'}} className={hideCPU ? 'hidden' : ''}>
-						<div data-host={this.NetDataHost} className="netdata-container-with-legend" id="chart_system_cpu" data-netdata="system.cpu" data-width="100%" data-height="180px" data-dygraph-valuerange="[0, 100]" data-before="0" data-after="-420" data-id="neb-cor-01_system_cpu" data-colors="" data-decimal-digits="-1" role="application" style={{width:'100%',height:'180px'}}>	
+						<div data-host={this.NetDataHost} className="netdata-container-with-legend" id="chart_system_cpu" data-netdata="system.cpu" data-width="100%" data-height="250px" data-dygraph-valuerange="[0, 100]" data-before="0" data-after="-420" data-id="neb-cor-01_system_cpu" data-colors="" data-decimal-digits="-1" role="application" style={{width:'100%',height:'250px'}}>	
 						</div>				
 					</div>
 					<div  style={{width:'100%', height:'100%', align:'center'}} className={hideMemory ? 'hidden' : ''}>	 
-					   <div data-host={this.NetDataHost} className="netdata-container-with-legend" id="chart_system_ram" data-netdata="system.ram" data-width="100%" data-height="180px" data-dygraph-valuerange="[null, null]" data-before="0" data-after="-420" data-id="neb-cor-01_system_ram" data-colors="" data-decimal-digits="-1" role="application" style={{width:'100%',height:'180px'}}>	   
+					   <div data-host={this.NetDataHost} className="netdata-container-with-legend" id="chart_system_ram" data-netdata="system.ram" data-width="100%" data-height="250px" data-dygraph-valuerange="[null, null]" data-before="0" data-after="-420" data-id="neb-cor-01_system_ram" data-colors="" data-decimal-digits="-1" role="application" style={{width:'100%',height:'250px'}}>	   
 						</div>				
 					</div>
 					<div  style={{width:'100%', height:'100%', align:'center'}} className={hideDisk ? 'hidden' : ''}>	 
-					   <div data-host={this.NetDataHost} className="netdata-container-with-legend" id="chart_system_io" data-netdata="system.io" data-width="100%" data-height="180px" data-dygraph-valuerange="[null, null]" data-before="0" data-after="-420" data-id="neb-cor-01_system_io" data-colors="" data-decimal-digits="-1" role="application" style={{width:'100%',height:'180px'}}>	   
+					   <div data-host={this.NetDataHost} className="netdata-container-with-legend" id="chart_system_io" data-netdata="system.io" data-width="100%" data-height="250px" data-dygraph-valuerange="[null, null]" data-before="0" data-after="-420" data-id="neb-cor-01_system_io" data-colors="" data-decimal-digits="-1" role="application" style={{width:'100%',height:'250px'}}>	   
 						</div>				
 					</div>
 					<div  style={{width:'100%', height:'100%', align:'center'}} className={hideNetwork ? 'hidden' : ''}>	 
-					  <div data-host={this.NetDataHost} className="netdata-container-with-legend" id="chart_system_net" data-netdata="system.net" data-width="100%" data-height="180px" data-dygraph-valuerange="[null, null]" data-before="0" data-after="-420" data-id="neb-cor-01_system_net" data-colors="" data-decimal-digits="-1" role="application" style={{width:'100%',height:'180px'}}>	   
+					  <div data-host={this.NetDataHost} className="netdata-container-with-legend" id="chart_system_net" data-netdata="system.net" data-width="100%" data-height="250px" data-dygraph-valuerange="[null, null]" data-before="0" data-after="-420" data-id="neb-cor-01_system_net" data-colors="" data-decimal-digits="-1" role="application" style={{width:'100%',height:'250px'}}>	   
 						</div>				
 					</div>
 					<div  style={{width:'100%', height:'100%', align:'center'}} className={hideService ? 'hidden' : ''}>	 
-					   <div data-host={this.NetDataHost} className="netdata-container-with-legend" id="chart_services_cpu" data-netdata="services.cpu" data-width="100%" data-height="180px" data-dygraph-valuerange="[null, null]" data-before="0" data-after="-420" data-id="neb-cor-01_services_cpu" data-colors="" data-decimal-digits="-1" role="application" style={{width:'100%',height:'180px'}}>	   
+					   <div data-host={this.NetDataHost} className="netdata-container-with-legend" id="chart_services_cpu" data-netdata="services.cpu" data-width="100%" data-height="250px" data-dygraph-valuerange="[null, null]" data-before="0" data-after="-420" data-id="neb-cor-01_services_cpu" data-colors="" data-decimal-digits="-1" role="application" style={{width:'100%',height:'250px'}}>	   
 						</div>				
 					</div>
 				</div>

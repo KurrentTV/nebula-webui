@@ -84,11 +84,12 @@
 
     -->    
      <script type="text/javascript">  
-     		var netdataTheme = 'slate';     
+     		var netdataTheme = 'slate';  
+     		var netdataNoBootstrap = true;  
      </script>	
     <script language="JavaScript">
 		 var randomnos = Math.ceil(Math.random() * 1000000000);
-		var mysource = "dashboard.js?v"+randomnos;
+		var mysource = "https://kurrenttv.nbla.cloud:3800/dashboard.js?v"+randomnos;
 		window.onload = function() {
 		    var script = document.createElement('script');
 		    script.src = mysource;
