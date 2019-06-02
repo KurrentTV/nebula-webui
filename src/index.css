@@ -7,5 +7,6 @@ color: #e4e7ea !important;
 }
 .netdatabutton:hover{color:#20a8d8 !important;}
 .netdatabutton:focus{color:#20a8d8 !important;}
+.assetTable .react-bs-table-bordered{border:1px solid #23282c;}
 
 

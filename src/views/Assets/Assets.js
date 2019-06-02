@@ -45,6 +45,12 @@ class Assets extends Component {
   	else return cell;
   		
   }
+  assetStatusFlag(cell){  
+  	if(cell === 1) 
+  	return <i className='fa fa-circle text-success' />
+  	else return <i className='fa fa-circle text-disabled' />
+  		
+  }
   folderName(cell){  
   
   	let folder = '';
@@ -120,16 +126,19 @@ class Assets extends Component {
   }
   componentDidMount() {
     const data = { object_type: 'asset', id_view:1};  
-      NebulaApi.getAssets(data).then(res => {      	     	
+      NebulaApi.getAssets(data).then(res => {   
+         	
+        var arr = [];
+		arr.push(res.data.data); 
         this.setState({
-          items: res.data,
+          items: arr,
           isLoaded: true
         })}
        ).catch( err => {
         console.error(err)
       })
   }  
-  showLayout = (_layout) => {
+  showLayout = (_layout) => {  	
   	this.setState({
         layout: _layout
       });
@@ -140,7 +149,12 @@ class Assets extends Component {
         tableItems: _showHide
       });
   }
-
+  bytesToSize(bytes) {
+	   var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+	   if (bytes == 0) return '0 Byte';
+	   var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
+	   return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i];
+  }
   toggle = (tab) => {  
     if (this.state.activeTab !== tab) {
       this.setState({
@@ -182,8 +196,10 @@ class Assets extends Component {
       const data = { object_type: "asset", id_view: viewType };
       NebulaApi.getAssets(data).then(
         response => {
+        	var arr = [];
+		arr.push(response.data.data); 
           this.setState({
-            items: response.data,
+            items: arr,
             isLoaded: true
           });
         },
@@ -231,15 +247,15 @@ class Assets extends Component {
 		if(layout == 'List')
 		{
 			_tableData = (
-			<BootstrapTable data={items.data} version="4" striped hover pagination options={this.options}>
-	            <TableHeaderColumn isKey dataField="title" dataSort>Title</TableHeaderColumn>
-	             <TableHeaderColumn dataField="subtitle" dataFormat={ this.subTitleFormat } dataSort>Sub Title</TableHeaderColumn>
-	            <TableHeaderColumn dataField="idec" dataFormat={ this.subTitleFormat } dataSort>IDEC</TableHeaderColumn>
-	            <TableHeaderColumn dataField="id_folder" dataSort dataFormat={this.folderName}>Folder</TableHeaderColumn>
-	            <TableHeaderColumn dataField="gener" dataFormat={ this.subTitleFormat } dataSort>Genre</TableHeaderColumn>
-	            <TableHeaderColumn dataField="duration" dataSort dataFormat={this.secondsToHms}>Duration</TableHeaderColumn>
-	            <TableHeaderColumn dataField="ctime" dataFormat={ this.formatTime } dataSort>Created</TableHeaderColumn>
-	            <TableHeaderColumn dataField="mtime" dataFormat={ this.formatTime } dataSort>Modified</TableHeaderColumn>
+			<BootstrapTable data={items[0]} version="4" style={{border:'1px solid #23282c'}} striped hover pagination options={this.options} className="assetTable">
+	            <TableHeaderColumn isKey dataField="title">Title</TableHeaderColumn>
+	             <TableHeaderColumn dataField="subtitle" dataFormat={ this.subTitleFormat }>Sub Title</TableHeaderColumn>
+	            <TableHeaderColumn dataField="idec" dataFormat={ this.subTitleFormat }>IDEC</TableHeaderColumn>
+	            <TableHeaderColumn dataField="id_folder" dataFormat={this.folderName}>Folder</TableHeaderColumn>
+	            <TableHeaderColumn dataField="gener" dataFormat={ this.subTitleFormat }>Genre</TableHeaderColumn>
+	            <TableHeaderColumn dataField="duration"  dataFormat={this.secondsToHms}>Duration</TableHeaderColumn>
+	            <TableHeaderColumn dataField="ctime" dataFormat={ this.formatTime }>Created</TableHeaderColumn>
+	            <TableHeaderColumn dataField="mtime" dataFormat={ this.formatTime }>Modified</TableHeaderColumn>
 	          </BootstrapTable>
 			);
 		}
@@ -247,32 +263,32 @@ class Assets extends Component {
 		{
 			_tableData = (			
 			<div className="row">		        
-	        	  {items.data.map(item =>(
+	        	  {items[0].map(item =>(
 	        	  
 	        	  		<Col xl="2" md="4" sm="6" xs="12" className="mb-4">
-	        	  			<table className="w-100">
+	        	  			<table className="w-100" style={{tableLayout:'fixed'}}>
 						        <tbody>
-						        <tr key={item.id}>
+						        <tr key={item['id']}>
 						        <div style={{ position:'relative' }}>
 						        <img style={{ width: '100%'}} src={'/assets/img/hqdefault.jpg'} alt="boohoo" className="img-responsive"/>
 						         <i style={{ position:'absolute' ,top:'50%' ,left:'50%' ,fontSize:'50px' ,margin:'-25px 0 0 -20px'}} className="fa fa-play-circle"></i>
 						         </div>
-						        <h5>{this.subTitleFormat(item.title)}</h5>
-						          <i className="fa fa-circle text-success" />
+						        <h5>{this.subTitleFormat(item['title'])}</h5>
+						          {this.assetStatusFlag(item['status'])}
 						          <span>  </span>
 						          <i className="fa fa-flag text-danger" />
 						          <span>  </span>
-						          <button className="badge badge-block btn-primary" disabled>{this.folderName(item.id_folder)} </button>
+						          {this.folderName(item['id_folder'])}						         
 						          <span>  </span>
-						          <button className="badge badge-block btn-outline-secondary" disabled>{this.secondsToHms(item.duration)}</button>
+						          <button className="badge badge-block btn-outline-secondary" disabled>{this.secondsToHms(item['duration'])}</button>
 						          <span>  </span>
-						          <button className="badge badge-block btn-outline-secondary" disabled>163.64GB</button>
+						          <button className="badge badge-block btn-outline-secondary" disabled>{this.bytesToSize(item['file/size'])}</button>
 						          <span>  </span>
-						          <button className="badge badge-block btn-outline-secondary" disabled>25FPS</button>
+						          <button className="badge badge-block btn-outline-secondary" disabled>{item['video/fps']}FPS</button>
 						          <span>  </span>
-						          <button className="badge badge-block btn-outline-secondary" disabled>DNXHD</button>
+						          <button className="badge badge-block btn-outline-secondary" disabled>{item['video/codec']}</button>
 						          <span>  </span>
-						          <button className="badge badge-block btn-outline-secondary" disabled>1920x1080</button>
+						          <button className="badge badge-block btn-outline-secondary" disabled>{item['video/width']}x{item['video/height']}</button>
 						        </tr>
 						        </tbody>
 						      </table>
@@ -403,8 +419,8 @@ class Assets extends Component {
               <Col sm="4" className="d-none d-sm-inline-block">
                 <ButtonToolbar className="float-left" aria-label="Toolbar with button groups">
                   <ButtonGroup className="mr-3" aria-label="First group">
-                    <Button color="outline-secondary"><i className="fa fa-th-list"></i></Button>
-                    <Button color="outline-secondary"><i className="fa fa-th-large"></i></Button>
+                     <Button onClick={() => { this.showLayout('List'); }} color="outline-secondary"><i className="fa fa-th-list"></i></Button>
+                    <Button onClick={() => { this.showLayout('Grid'); }} color="outline-secondary"><i className="fa fa-th-large"></i></Button>
                     <Button onClick={() => { this.showOptions(true); }} color="outline-secondary"><i className="fa fa-gear"></i></Button>
                   </ButtonGroup>
                 </ButtonToolbar>
@@ -436,8 +452,8 @@ class Assets extends Component {
               <Col sm="4" className="d-none d-sm-inline-block">
                 <ButtonToolbar className="float-left" aria-label="Toolbar with button groups">
                   <ButtonGroup className="mr-3" aria-label="First group">
-                    <Button color="outline-secondary"><i className="fa fa-th-list"></i></Button>
-                    <Button color="outline-secondary"><i className="fa fa-th-large"></i></Button>
+                     <Button onClick={() => { this.showLayout('List'); }} color="outline-secondary"><i className="fa fa-th-list"></i></Button>
+                    <Button onClick={() => { this.showLayout('Grid'); }} color="outline-secondary"><i className="fa fa-th-large"></i></Button>
                     <Button onClick={() => { this.showOptions(true); }} color="outline-secondary"><i className="fa fa-gear"></i></Button>
                   </ButtonGroup>
                 </ButtonToolbar>
@@ -469,8 +485,8 @@ class Assets extends Component {
               <Col sm="4" className="d-none d-sm-inline-block">
                 <ButtonToolbar className="float-left" aria-label="Toolbar with button groups">
                   <ButtonGroup className="mr-3" aria-label="First group">
-                    <Button color="outline-secondary"><i className="fa fa-th-list"></i></Button>
-                    <Button color="outline-secondary"><i className="fa fa-th-large"></i></Button>
+                     <Button onClick={() => { this.showLayout('List'); }} color="outline-secondary"><i className="fa fa-th-list"></i></Button>
+                    <Button onClick={() => { this.showLayout('Grid'); }} color="outline-secondary"><i className="fa fa-th-large"></i></Button>
                     <Button onClick={() => { this.showOptions(true); }} color="outline-secondary"><i className="fa fa-gear"></i></Button>
                   </ButtonGroup>
                 </ButtonToolbar>
@@ -502,8 +518,8 @@ class Assets extends Component {
               <Col sm="4" className="d-none d-sm-inline-block">
                 <ButtonToolbar className="float-left" aria-label="Toolbar with button groups">
                   <ButtonGroup className="mr-3" aria-label="First group">
-                    <Button color="outline-secondary"><i className="fa fa-th-list"></i></Button>
-                    <Button color="outline-secondary"><i className="fa fa-th-large"></i></Button>
+                     <Button onClick={() => { this.showLayout('List'); }} color="outline-secondary"><i className="fa fa-th-list"></i></Button>
+                    <Button onClick={() => { this.showLayout('Grid'); }} color="outline-secondary"><i className="fa fa-th-large"></i></Button>
                     <Button onClick={() => { this.showOptions(true); }} color="outline-secondary"><i className="fa fa-gear"></i></Button>
                   </ButtonGroup>
                 </ButtonToolbar>
@@ -535,8 +551,8 @@ class Assets extends Component {
               <Col sm="4" className="d-none d-sm-inline-block">
                 <ButtonToolbar className="float-left" aria-label="Toolbar with button groups">
                   <ButtonGroup className="mr-3" aria-label="First group">
-                    <Button color="outline-secondary"><i className="fa fa-th-list"></i></Button>
-                    <Button color="outline-secondary"><i className="fa fa-th-large"></i></Button>
+                     <Button onClick={() => { this.showLayout('List'); }} color="outline-secondary"><i className="fa fa-th-list"></i></Button>
+                    <Button onClick={() => { this.showLayout('Grid'); }} color="outline-secondary"><i className="fa fa-th-large"></i></Button>
                     <Button onClick={() => { this.showOptions(true); }} color="outline-secondary"><i className="fa fa-gear"></i></Button>
                   </ButtonGroup>
                 </ButtonToolbar>
@@ -568,8 +584,8 @@ class Assets extends Component {
               <Col sm="4" className="d-none d-sm-inline-block">
                 <ButtonToolbar className="float-left" aria-label="Toolbar with button groups">
                   <ButtonGroup className="mr-3" aria-label="First group">
-                    <Button color="outline-secondary"><i className="fa fa-th-list"></i></Button>
-                    <Button color="outline-secondary"><i className="fa fa-th-large"></i></Button>
+                    <Button onClick={() => { this.showLayout('List'); }} color="outline-secondary"><i className="fa fa-th-list"></i></Button>
+                    <Button onClick={() => { this.showLayout('Grid'); }} color="outline-secondary"><i className="fa fa-th-large"></i></Button>
                     <Button onClick={() => { this.showOptions(true); }} color="outline-secondary"><i className="fa fa-gear"></i></Button>
                   </ButtonGroup>
                 </ButtonToolbar>
@@ -601,8 +617,8 @@ class Assets extends Component {
               <Col sm="4" className="d-none d-sm-inline-block">
                 <ButtonToolbar className="float-left" aria-label="Toolbar with button groups">
                   <ButtonGroup className="mr-3" aria-label="First group">
-                    <Button color="outline-secondary"><i className="fa fa-th-list"></i></Button>
-                    <Button color="outline-secondary"><i className="fa fa-th-large"></i></Button>
+                     <Button onClick={() => { this.showLayout('List'); }} color="outline-secondary"><i className="fa fa-th-list"></i></Button>
+                    <Button onClick={() => { this.showLayout('Grid'); }} color="outline-secondary"><i className="fa fa-th-large"></i></Button>
                     <Button onClick={() => { this.showOptions(true); }} color="outline-secondary"><i className="fa fa-gear"></i></Button>
                   </ButtonGroup>
                 </ButtonToolbar>
