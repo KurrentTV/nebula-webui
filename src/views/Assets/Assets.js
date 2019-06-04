@@ -138,16 +138,38 @@ class Assets extends Component {
         console.error(err)
       })
   }  
-  showLayout = (_layout) => {  	
+  showLayout = (_layout) => { 
+   	
   	this.setState({
         layout: _layout
       });
   }
   
-  showOptions = (_showHide) => {
+  showOptions = (_showHide) => {   
   	this.setState({
-        tableItems: _showHide
+        tableItems: !this.state.tableItems
       });
+  }
+  videoCodec(cell){
+  	if(cell != "" && cell != null &&  typeof cell !== undefined)
+  	{
+		return cell.toUpperCase();
+	}
+	else
+	{
+		return "";
+	}  	
+  }
+  fpsFormat(cell){
+  	if(cell != "" && cell != null &&  typeof cell !== undefined)
+  	{
+		var fps = cell.split("/");	
+		return fps[0];
+	}
+	else
+	{
+		return "0";
+	}
   }
   bytesToSize(bytes) {
 	   var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
@@ -261,11 +283,13 @@ class Assets extends Component {
 		}
 		else if(layout == 'Grid')
 		{
-			_tableData = (			
-			<div className="row">		        
+			if(items[0].length > 0)
+			{
+				_tableData = (			
+			<div className="row" style={{border:'1px solid #23282c',paddingTop:'18px'}}>		        
 	        	  {items[0].map(item =>(
 	        	  
-	        	  		<Col xl="2" md="4" sm="6" xs="12" className="mb-4">
+	        	  		<Col key={item['id']} xl="2" md="4" sm="6" xs="12" className="mb-4">
 	        	  			<table className="w-100" style={{tableLayout:'fixed'}}>
 						        <tbody>
 						        <tr key={item['id']}>
@@ -284,9 +308,9 @@ class Assets extends Component {
 						          <span>  </span>
 						          <button className="badge badge-block btn-outline-secondary" disabled>{this.bytesToSize(item['file/size'])}</button>
 						          <span>  </span>
-						          <button className="badge badge-block btn-outline-secondary" disabled>{item['video/fps']}FPS</button>
+						          <button className="badge badge-block btn-outline-secondary" disabled>{this.fpsFormat(item['video/fps'])}FPS</button>
 						          <span>  </span>
-						          <button className="badge badge-block btn-outline-secondary" disabled>{item['video/codec']}</button>
+						          <button className="badge badge-block btn-outline-secondary" disabled>{this.videoCodec(item['video/codec'])}</button>
 						          <span>  </span>
 						          <button className="badge badge-block btn-outline-secondary" disabled>{item['video/width']}x{item['video/height']}</button>
 						        </tr>
@@ -298,7 +322,12 @@ class Assets extends Component {
                     ))}
 		    </div>		
 		
-			);
+			);	
+			}
+			else
+			{
+				_tableData = (<div className="row" style={{paddingLeft:'17px'}}>No Record Found!</div>);
+			}
 		}		
 	}
 	else
