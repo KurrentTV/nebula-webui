@@ -105,13 +105,13 @@ class Details extends Component {
 
 
   componentDidMount() {
-    const id = this.props.match.params.id
-    const payload = { object_type: "asset" };
+    const id = Number(this.props.match.params.id);
+    const payload = { object_type: "asset", ids: [id] };
     NebulaApi.getAssets(payload).then(
       res => {
-        let asset = {}
+        let asset = {};
 
-        console.log(res.data, id)
+        console.log(res.data, id);
         if (res && res.data && res.data.data) {
           asset = res.data.data.find(item => item.id === parseInt(id)) || {}
         }
