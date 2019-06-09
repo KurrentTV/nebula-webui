@@ -9,6 +9,7 @@ import displayoptions from './display-options';
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 import NebulaApi from '../../utils/api/NebulaApi';
+import {Link} from "react-router-dom";
 
 const options = displayoptions.DOPTIONS;
 
@@ -45,7 +46,12 @@ class Assets extends Component {
   	else return cell;
   		
   }
-  assetStatusFlag(cell){  
+  titleFormat(cell, row){
+  	if(cell === "" || cell == 'undefined' || cell == null)
+  	return "-";
+    else return <Link to={`/asset/${row.id}`}>{cell}</Link>;
+  }
+  assetStatusFlag(cell){
   	if(cell === 1) 
   	return <i className='fa fa-circle text-success' />
   	else return <i className='fa fa-circle text-disabled' />
@@ -270,7 +276,7 @@ class Assets extends Component {
 		{
 			_tableData = (
 			<BootstrapTable data={items[0]} version="4" style={{border:'1px solid #23282c'}} striped hover pagination options={this.options} className="assetTable">
-	            <TableHeaderColumn isKey dataField="title">Title</TableHeaderColumn>
+	            <TableHeaderColumn isKey dataField="title" dataFormat={ this.titleFormat }>Title</TableHeaderColumn>
 	             <TableHeaderColumn dataField="subtitle" dataFormat={ this.subTitleFormat }>Sub Title</TableHeaderColumn>
 	            <TableHeaderColumn dataField="idec" dataFormat={ this.subTitleFormat }>IDEC</TableHeaderColumn>
 	            <TableHeaderColumn dataField="id_folder" dataFormat={this.folderName}>Folder</TableHeaderColumn>

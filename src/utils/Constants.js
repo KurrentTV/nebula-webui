@@ -6,3 +6,20 @@ export const JOBS_URL = '/api/jobs';
 export const API_USERNAME = 'demo';
 export const API_PASSWORD = 'demo';
 export const API_VERSION = '1'
+export const MEDIA_TYPES = {
+  0: 'VIRTUAL',
+  1: 'FILE',
+  2: 'URI',
+};
+export const CONTENT_TYPES = {
+  1: 'AUDIO',
+  2: 'VIDEO',
+  3: 'IMAGE',
+  4: 'TEXT',
+  5: 'DATABROADCASTING',
+  6: 'INTERSTITIAL',
+  7: 'EDUCATION',
+  8: 'APPLICATION',
+  9: 'GAME',
+  10: 'PACKAGE',
+};
