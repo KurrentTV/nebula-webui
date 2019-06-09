@@ -78,7 +78,6 @@ class ThemeColor extends Component {
 
     // const { className, children, ...attributes } = this.props
     const { children, className } = this.props
-
     const classes = classNames(className, 'theme-color w-75 rounded mb-3')
 
     return (
@@ -111,11 +110,9 @@ class Details extends Component {
       res => {
         let asset = {};
 
-        console.log(res.data, id);
         if (res && res.data && res.data.data) {
           asset = res.data.data.find(item => item.id === parseInt(id)) || {}
         }
-        console.log(res.data);
         this.setState({asset, assetInitial: { ...asset }, isLoaded: true})
       },
       err => {
@@ -145,15 +142,23 @@ class Details extends Component {
 
   handleSave = () => {
     const { asset } = this.state;
-    console.log('onSave', asset)
-    // TODO send save request
+    const payload = { object_type: "asset", objects: [asset.id], data: asset };
+
+    // update asset request
+    NebulaApi.setAssets(payload).then(
+      res => {
+        this.props.history.push('/assets')
+      },
+      err => {
+        console.error(err);
+      }
+    );
   }
 
   render() {
     const { asset, isLoaded } = this.state;
     const create_date = new Date(asset['ctime'])
 
-    console.log('asset', asset)
     return (
       <div className="animated fadeIn">
         <div className="card">
