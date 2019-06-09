@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { filter } from 'lodash';
 import { Badge, Button, ButtonGroup, ButtonToolbar, Col, Collapse, FormGroup, Input, InputGroup, InputGroupAddon, Nav, NavItem, NavLink, Row, TabContent, TabPane } from 'reactstrap';
 import classnames from 'classnames';
 import {Card, CardHeader, CardBody} from 'reactstrap';
@@ -25,7 +26,8 @@ class Assets extends Component {
       items: [],
       isLoaded: false,
       tableItems: false,
-      layout: 'List'
+      layout: 'List',
+      search: ''
     };
 
     this.MainTable = data.rows;
@@ -135,7 +137,7 @@ class Assets extends Component {
       NebulaApi.getAssets(data).then(res => {   
          	
         var arr = [];
-		arr.push(res.data.data); 
+		    arr.push(res.data.data);
         this.setState({
           items: arr,
           isLoaded: true
@@ -225,7 +227,7 @@ class Assets extends Component {
       NebulaApi.getAssets(data).then(
         response => {
         	var arr = [];
-		arr.push(response.data.data); 
+          arr.push(response.data.data);
           this.setState({
             items: arr,
             isLoaded: true
@@ -238,110 +240,123 @@ class Assets extends Component {
     }
       
   }
+  changeSearch = (event) => {
+    this.setState({search: event.target.value})
+  }
+  applySearch = () => {
+    this.setState({finalSearch: this.state.search})
+  }
+  resetSearch = () => {
+    this.setState({search: '', finalSearch: ''})
+  }
 
   render() {
   	var foldetStyle = {
-		padding:'5px',
-		color: 'eee'
-	}
-  	var {activeTab,items,isLoaded,tableItems,layout} = this.state;  	
-  	let formItems;let _tableData;
-  	if(tableItems===true){
-  		
-  		formItems = (
-  			 <FormGroup>
-                <Select
-                  name="form-field-name2"
-                  value={this.state.value}
-                  options={options}
-                  onChange={this.saveChanges}
-                  multi
-                />
-              </FormGroup>
-  		);
-	}	
-	if(isLoaded === true)
-	{
-		 var style = { 
-	        width:'100%'
-	    };
-	    var stImg = {
-			position:'absolute',
-			top:'50%',
-			left:'50%',
-			fontSize:'50px',
-			margin:'-25px 0px 0px -20px'
-		}
-		if(layout == 'List')
-		{
-			_tableData = (
-			<BootstrapTable data={items[0]} version="4" style={{border:'1px solid #23282c'}} striped hover pagination options={this.options} className="assetTable">
-	            <TableHeaderColumn isKey dataField="title" dataFormat={ this.titleFormat }>Title</TableHeaderColumn>
-	             <TableHeaderColumn dataField="subtitle" dataFormat={ this.subTitleFormat }>Sub Title</TableHeaderColumn>
-	            <TableHeaderColumn dataField="idec" dataFormat={ this.subTitleFormat }>IDEC</TableHeaderColumn>
-	            <TableHeaderColumn dataField="id_folder" dataFormat={this.folderName}>Folder</TableHeaderColumn>
-	            <TableHeaderColumn dataField="gener" dataFormat={ this.subTitleFormat }>Genre</TableHeaderColumn>
-	            <TableHeaderColumn dataField="duration"  dataFormat={this.secondsToHms}>Duration</TableHeaderColumn>
-	            <TableHeaderColumn dataField="ctime" dataFormat={ this.formatTime }>Created</TableHeaderColumn>
-	            <TableHeaderColumn dataField="mtime" dataFormat={ this.formatTime }>Modified</TableHeaderColumn>
-	          </BootstrapTable>
-			);
-		}
-		else if(layout == 'Grid')
-		{
-			if(items[0].length > 0)
-			{
-				_tableData = (			
-			<div className="row" style={{border:'1px solid #23282c',paddingTop:'18px'}}>		        
-	        	  {items[0].map(item =>(
-	        	  
-	        	  		<Col key={item['id']} xl="2" md="4" sm="6" xs="12" className="mb-4">
-	        	  			<table className="w-100" style={{tableLayout:'fixed'}}>
-						        <tbody>
-						        <tr key={item['id']}>
-						        <div style={{ position:'relative' }}>
-						        <img style={{ width: '100%'}} src={'/assets/img/hqdefault.jpg'} alt="boohoo" className="img-responsive"/>
-						         <i style={{ position:'absolute' ,top:'50%' ,left:'50%' ,fontSize:'50px' ,margin:'-25px 0 0 -20px'}} className="fa fa-play-circle"></i>
-						         </div>
-						        <h5>{this.subTitleFormat(item['title'])}</h5>
-						          {this.assetStatusFlag(item['status'])}
-						          <span>  </span>
-						          <i className="fa fa-flag text-danger" />
-						          <span>  </span>
-						          {this.folderName(item['id_folder'])}						         
-						          <span>  </span>
-						          <button className="badge badge-block btn-outline-secondary" disabled>{this.secondsToHms(item['duration'])}</button>
-						          <span>  </span>
-						          <button className="badge badge-block btn-outline-secondary" disabled>{this.bytesToSize(item['file/size'])}</button>
-						          <span>  </span>
-						          <button className="badge badge-block btn-outline-secondary" disabled>{this.fpsFormat(item['video/fps'])}FPS</button>
-						          <span>  </span>
-						          <button className="badge badge-block btn-outline-secondary" disabled>{this.videoCodec(item['video/codec'])}</button>
-						          <span>  </span>
-						          <button className="badge badge-block btn-outline-secondary" disabled>{item['video/width']}x{item['video/height']}</button>
-						        </tr>
-						        </tbody>
-						      </table>
-	        	  		
-	        	  		</Col>
-	        	  		                          
-                    ))}
-		    </div>		
-		
-			);	
-			}
-			else
-			{
-				_tableData = (<div className="row" style={{paddingLeft:'17px'}}>No Record Found!</div>);
-			}
-		}		
-	}
-	else
-	{
-		_tableData = ( <div> Loading....</div>);
-	}
-	
-	
+      padding:'5px',
+      color: 'eee'
+    }
+    var {activeTab,items,isLoaded,tableItems,layout,search,finalSearch} = this.state;
+    let formItems;let _tableData;
+    if(tableItems===true){
+
+      formItems = (
+        <FormGroup>
+          <Select
+            name="form-field-name2"
+            value={this.state.value}
+            options={options}
+            onChange={this.saveChanges}
+            multi
+          />
+        </FormGroup>
+      );
+    }
+    if(isLoaded === true)
+    {
+      var style = {
+        width:'100%'
+      };
+      var stImg = {
+        position:'absolute',
+        top:'50%',
+        left:'50%',
+        fontSize:'50px',
+        margin:'-25px 0px 0px -20px'
+      }
+      let finalItems = items[0]
+
+      if (finalSearch) {
+        finalItems = filter(items[0], obj => obj.title.indexOf(finalSearch) > -1);
+      }
+
+      if(layout == 'List')
+      {
+        _tableData = (
+        <BootstrapTable data={finalItems} version="4" style={{border:'1px solid #23282c'}} striped hover pagination options={this.options} className="assetTable">
+                <TableHeaderColumn isKey dataField="title" dataFormat={ this.titleFormat }>Title</TableHeaderColumn>
+                 <TableHeaderColumn dataField="subtitle" dataFormat={ this.subTitleFormat }>Sub Title</TableHeaderColumn>
+                <TableHeaderColumn dataField="idec" dataFormat={ this.subTitleFormat }>IDEC</TableHeaderColumn>
+                <TableHeaderColumn dataField="id_folder" dataFormat={this.folderName}>Folder</TableHeaderColumn>
+                <TableHeaderColumn dataField="gener" dataFormat={ this.subTitleFormat }>Genre</TableHeaderColumn>
+                <TableHeaderColumn dataField="duration"  dataFormat={this.secondsToHms}>Duration</TableHeaderColumn>
+                <TableHeaderColumn dataField="ctime" dataFormat={ this.formatTime }>Created</TableHeaderColumn>
+                <TableHeaderColumn dataField="mtime" dataFormat={ this.formatTime }>Modified</TableHeaderColumn>
+              </BootstrapTable>
+        );
+      }
+      else if(layout == 'Grid')
+      {
+        if(finalItems.length > 0)
+        {
+          _tableData = (
+        <div className="row" style={{border:'1px solid #23282c',paddingTop:'18px'}}>
+                {finalItems.map(item =>(
+
+                    <Col key={item['id']} xl="2" md="4" sm="6" xs="12" className="mb-4">
+                      <table className="w-100" style={{tableLayout:'fixed'}}>
+                      <tbody>
+                      <tr key={item['id']}>
+                      <div style={{ position:'relative' }}>
+                      <img style={{ width: '100%'}} src={'/assets/img/hqdefault.jpg'} alt="boohoo" className="img-responsive"/>
+                       <i style={{ position:'absolute' ,top:'50%' ,left:'50%' ,fontSize:'50px' ,margin:'-25px 0 0 -20px'}} className="fa fa-play-circle"></i>
+                       </div>
+                      <h5>{this.subTitleFormat(item['title'])}</h5>
+                        {this.assetStatusFlag(item['status'])}
+                        <span>  </span>
+                        <i className="fa fa-flag text-danger" />
+                        <span>  </span>
+                        {this.folderName(item['id_folder'])}
+                        <span>  </span>
+                        <button className="badge badge-block btn-outline-secondary" disabled>{this.secondsToHms(item['duration'])}</button>
+                        <span>  </span>
+                        <button className="badge badge-block btn-outline-secondary" disabled>{this.bytesToSize(item['file/size'])}</button>
+                        <span>  </span>
+                        <button className="badge badge-block btn-outline-secondary" disabled>{this.fpsFormat(item['video/fps'])}FPS</button>
+                        <span>  </span>
+                        <button className="badge badge-block btn-outline-secondary" disabled>{this.videoCodec(item['video/codec'])}</button>
+                        <span>  </span>
+                        <button className="badge badge-block btn-outline-secondary" disabled>{item['video/width']}x{item['video/height']}</button>
+                      </tr>
+                      </tbody>
+                    </table>
+
+                    </Col>
+
+                      ))}
+          </div>
+
+        );
+        }
+        else
+        {
+          _tableData = (<div className="row" style={{paddingLeft:'17px'}}>No Record Found!</div>);
+        }
+      }
+    }
+    else
+    {
+      _tableData = ( <div> Loading....</div>);
+    }
 
     return (
       <div className="animated fadeIn">
@@ -434,11 +449,11 @@ class Assets extends Component {
               <FormGroup className="float-right">
                 <InputGroup>
                   <InputGroupAddon addonType="prepend">
-                    <Button type="button" color="btn btn-outline-dark btn-block"><i className="fa fa-search"></i></Button>
+                    <Button type="button" color="btn btn-outline-dark btn-block" onClick={this.applySearch}><i className="fa fa-search"></i></Button>
                   </InputGroupAddon>
-                  <Input type="text" id="input3-group2" name="input3-group2" placeholder="Search" />
+                  <Input type="text" id="input3-group2" name="input3-group2" placeholder="Search" value={search} onChange={this.changeSearch} />
                   <InputGroupAddon addonType="append">
-                    <Button type="button" color="btn btn-outline-dark btn-block"><i className="fa fa-times"></i></Button>
+                    <Button type="button" color="btn btn-outline-dark btn-block" onClick={this.resetSearch}><i className="fa fa-times"></i></Button>
                   </InputGroupAddon>
                 </InputGroup>
               </FormGroup>
