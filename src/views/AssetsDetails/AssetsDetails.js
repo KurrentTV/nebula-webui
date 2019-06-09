@@ -227,11 +227,11 @@ class Details extends Component {
                               </FormGroup>
                               <FormGroup>
                                 <Label htmlFor="name">Subtitle</Label>
-                                <Input type="text" id="subtitle" placeholder="Subtitle..." value={asset.subtitle} onChange={this.onChange('subtitle')} required />
+                                <Input type="text" id="subtitle" placeholder="Subtitle..." value={asset.subtitle || ''} onChange={this.onChange('subtitle')} required />
                               </FormGroup>
                               <FormGroup>
                                 <Label htmlFor="name">Description</Label>
-                                <Input type="textarea" name="textarea-input" id="textarea-input" rows="2" value={asset.description} onChange={this.onChange('description')}
+                                <Input type="textarea" name="textarea-input" id="textarea-input" rows="2" value={asset.description || ''} onChange={this.onChange('description')}
                                        placeholder="Description..." />
                               </FormGroup>
                               <FormGroup>
