@@ -1,7 +1,6 @@
 exports.DOPTIONS = [
     { value: 'Title', label: 'Title', disabled: true },
 		{ value: 'Subtitle', label: 'Subtitle', disabled: true },
-		{ value: 'Subtitle', label: 'Subtitle', disabled: true },
 		{ value: 'Duration', label: 'Duration', disabled: true },
 		{ value: 'Description', label: 'Description'},
 		{ value: 'IDEC', label: 'IDEC', disabled: true },

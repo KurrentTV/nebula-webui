@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import { filter } from 'lodash';
+import { filter, map } from 'lodash';
 import { Badge, Button, ButtonGroup, ButtonToolbar, Col, Collapse, FormGroup, Input, InputGroup, InputGroupAddon, Nav, NavItem, NavLink, Row, TabContent, TabPane } from 'reactstrap';
 import classnames from 'classnames';
+import cookie from 'react-cookies';
 import {Card, CardHeader, CardBody} from 'reactstrap';
 import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
 import data from './_data';
@@ -27,7 +28,8 @@ class Assets extends Component {
       isLoaded: false,
       tableItems: false,
       layout: 'List',
-      search: ''
+      search: '',
+      selectedOption: [],
     };
 
     this.MainTable = data.rows;
@@ -126,11 +128,15 @@ class Assets extends Component {
   	var d = date.getDay();
   	var m = date.getMonth();
   	var y = date.getFullYear();
-	var hours = date.getHours();
-	var minutes = "0" + date.getMinutes();
-	var seconds = "0" + date.getSeconds();
-	var formattedTime = y + '-' + m + '-' + d + ' ' + hours + ':' + minutes.substr(-2);
-	return formattedTime;
+    var hours = date.getHours();
+    var minutes = "0" + date.getMinutes();
+    var seconds = "0" + date.getSeconds();
+    var formattedTime = y + '-' + m + '-' + d + ' ' + hours + ':' + minutes.substr(-2);
+    return formattedTime;
+  }
+  componentWillMount() {
+    const optionsCookie = cookie.load('assetOptions') || [];
+    this.setState({ selectedOptions: optionsCookie });
   }
   componentDidMount() {
     const data = { object_type: 'asset', id_view:1};  
@@ -147,7 +153,6 @@ class Assets extends Component {
       })
   }  
   showLayout = (_layout) => { 
-   	
   	this.setState({
         layout: _layout
       });
@@ -249,13 +254,17 @@ class Assets extends Component {
   resetSearch = () => {
     this.setState({search: '', finalSearch: ''})
   }
+  saveChanges = (selectedOptions) => {
+    cookie.save('assetOptions', selectedOptions);
+    this.setState({ selectedOptions });
+  }
 
   render() {
   	var foldetStyle = {
       padding:'5px',
       color: 'eee'
     }
-    var {activeTab,items,isLoaded,tableItems,layout,search,finalSearch} = this.state;
+    var {activeTab,items,isLoaded,tableItems,layout,search,finalSearch,selectedOptions} = this.state;
     let formItems;let _tableData;
     if(tableItems===true){
 
@@ -263,7 +272,7 @@ class Assets extends Component {
         <FormGroup>
           <Select
             name="form-field-name2"
-            value={this.state.value}
+            value={selectedOptions}
             options={options}
             onChange={this.saveChanges}
             multi
@@ -301,6 +310,8 @@ class Assets extends Component {
                 <TableHeaderColumn dataField="duration"  dataFormat={this.secondsToHms}>Duration</TableHeaderColumn>
                 <TableHeaderColumn dataField="ctime" dataFormat={ this.formatTime }>Created</TableHeaderColumn>
                 <TableHeaderColumn dataField="mtime" dataFormat={ this.formatTime }>Modified</TableHeaderColumn>
+                {map(selectedOptions, (item, index) => (<TableHeaderColumn dataField={item.value} dataFormat={ this.subTitleFormat }>{item.label}</TableHeaderColumn>))
+                }
               </BootstrapTable>
         );
       }
@@ -314,32 +325,33 @@ class Assets extends Component {
 
                     <Col key={item['id']} xl="2" md="4" sm="6" xs="12" className="mb-4">
                       <table className="w-100" style={{tableLayout:'fixed'}}>
-                      <tbody>
-                      <tr key={item['id']}>
-                      <div style={{ position:'relative' }}>
-                      <img style={{ width: '100%'}} src={'/assets/img/hqdefault.jpg'} alt="boohoo" className="img-responsive"/>
-                       <i style={{ position:'absolute' ,top:'50%' ,left:'50%' ,fontSize:'50px' ,margin:'-25px 0 0 -20px'}} className="fa fa-play-circle"></i>
-                       </div>
-                      <h5>{this.subTitleFormat(item['title'])}</h5>
-                        {this.assetStatusFlag(item['status'])}
-                        <span>  </span>
-                        <i className="fa fa-flag text-danger" />
-                        <span>  </span>
-                        {this.folderName(item['id_folder'])}
-                        <span>  </span>
-                        <button className="badge badge-block btn-outline-secondary" disabled>{this.secondsToHms(item['duration'])}</button>
-                        <span>  </span>
-                        <button className="badge badge-block btn-outline-secondary" disabled>{this.bytesToSize(item['file/size'])}</button>
-                        <span>  </span>
-                        <button className="badge badge-block btn-outline-secondary" disabled>{this.fpsFormat(item['video/fps'])}FPS</button>
-                        <span>  </span>
-                        <button className="badge badge-block btn-outline-secondary" disabled>{this.videoCodec(item['video/codec'])}</button>
-                        <span>  </span>
-                        <button className="badge badge-block btn-outline-secondary" disabled>{item['video/width']}x{item['video/height']}</button>
-                      </tr>
-                      </tbody>
-                    </table>
-
+                        <tbody>
+                          <tr key={item['id']}>
+                            <td>
+                              <div style={{ position:'relative' }}>
+                              <img style={{ width: '100%'}} src={'/assets/img/hqdefault.jpg'} alt="boohoo" className="img-responsive"/>
+                               <i style={{ position:'absolute' ,top:'50%' ,left:'50%' ,fontSize:'50px' ,margin:'-25px 0 0 -20px'}} className="fa fa-play-circle"></i>
+                               </div>
+                              <h5>{this.subTitleFormat(item['title'])}</h5>
+                                {this.assetStatusFlag(item['status'])}
+                                <span>  </span>
+                                <i className="fa fa-flag text-danger" />
+                                <span>  </span>
+                                {this.folderName(item['id_folder'])}
+                                <span>  </span>
+                                <button className="badge badge-block btn-outline-secondary" disabled>{this.secondsToHms(item['duration'])}</button>
+                                <span>  </span>
+                                <button className="badge badge-block btn-outline-secondary" disabled>{this.bytesToSize(item['file/size'])}</button>
+                                <span>  </span>
+                                <button className="badge badge-block btn-outline-secondary" disabled>{this.fpsFormat(item['video/fps'])}FPS</button>
+                                <span>  </span>
+                                <button className="badge badge-block btn-outline-secondary" disabled>{this.videoCodec(item['video/codec'])}</button>
+                                <span>  </span>
+                                <button className="badge badge-block btn-outline-secondary" disabled>{item['video/width']}x{item['video/height']}</button>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
                     </Col>
 
                       ))}
@@ -436,8 +448,8 @@ class Assets extends Component {
               <Col sm="4" className="d-none d-sm-inline-block">
                 <ButtonToolbar className="float-left" aria-label="Toolbar with button groups">
                   <ButtonGroup className="mr-3" aria-label="First group">
-                    <Button onClick={() => { this.showLayout('List'); }} color="outline-secondary"><i className="fa fa-th-list"></i></Button>
-                    <Button onClick={() => { this.showLayout('Grid'); }} color="outline-secondary"><i className="fa fa-th-large"></i></Button>
+                    <Button onClick={() => { this.showLayout('List'); }} active={layout === 'List'} color="outline-secondary"><i className="fa fa-th-list"></i></Button>
+                    <Button onClick={() => { this.showLayout('Grid'); }} active={layout === 'Grid'} color="outline-secondary"><i className="fa fa-th-large"></i></Button>
                     <Button onClick={() => { this.showOptions(true); }} color="outline-secondary"><i className="fa fa-gear"></i></Button>
                   </ButtonGroup>
                 </ButtonToolbar>
