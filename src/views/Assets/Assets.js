@@ -331,8 +331,8 @@ class Assets extends Component {
                               <div style={{ position:'relative' }}>
                               <img style={{ width: '100%'}} src={'/assets/img/hqdefault.jpg'} alt="boohoo" className="img-responsive"/>
                                <i style={{ position:'absolute' ,top:'50%' ,left:'50%' ,fontSize:'50px' ,margin:'-25px 0 0 -20px'}} className="fa fa-play-circle"></i>
-                               </div>
-                              <h5>{this.subTitleFormat(item['title'])}</h5>
+                              </div>
+                              <Link to={`/asset/${item['id']}`}><h5>{this.subTitleFormat(item['title'])}</h5></Link>
                                 {this.assetStatusFlag(item['status'])}
                                 <span>  </span>
                                 <i className="fa fa-flag text-danger" />
