@@ -5,6 +5,8 @@ import classnames from 'classnames';
 import cookie from 'react-cookies';
 import {Card, CardHeader, CardBody} from 'reactstrap';
 import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
+import { DefaultPlayer as Video } from 'react-html5video';
+import 'react-html5video/dist/styles.css';
 import data from './_data';
 // React select
 import displayoptions from './display-options';
@@ -12,6 +14,7 @@ import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 import NebulaApi from '../../utils/api/NebulaApi';
 import {Link} from "react-router-dom";
+import {KURRENTTV_BASE_URL} from "../../utils/Constants";
 
 const options = displayoptions.DOPTIONS;
 
@@ -310,7 +313,7 @@ class Assets extends Component {
                 <TableHeaderColumn dataField="duration"  dataFormat={this.secondsToHms}>Duration</TableHeaderColumn>
                 <TableHeaderColumn dataField="ctime" dataFormat={ this.formatTime }>Created</TableHeaderColumn>
                 <TableHeaderColumn dataField="mtime" dataFormat={ this.formatTime }>Modified</TableHeaderColumn>
-                {map(selectedOptions, (item, index) => (<TableHeaderColumn dataField={item.value} dataFormat={ this.subTitleFormat }>{item.label}</TableHeaderColumn>))
+                {map(selectedOptions, (item, index) => (<TableHeaderColumn key={index} dataField={item.value} dataFormat={ this.subTitleFormat }>{item.label}</TableHeaderColumn>))
                 }
               </BootstrapTable>
         );
@@ -329,8 +332,16 @@ class Assets extends Component {
                           <tr key={item['id']}>
                             <td>
                               <div style={{ position:'relative' }}>
-                              <img style={{ width: '100%'}} src={'/assets/img/hqdefault.jpg'} alt="boohoo" className="img-responsive"/>
-                               <i style={{ position:'absolute' ,top:'50%' ,left:'50%' ,fontSize:'50px' ,margin:'-25px 0 0 -20px'}} className="fa fa-play-circle"></i>
+                                <Video
+                                  autoPlay={false}
+                                  controls={['PlayPause', 'Seek', 'Time', 'Volume', 'Fullscreen']}
+                                  poster="/assets/img/hqdefault.jpg"
+                                  onCanPlayThrough={() => {
+                                    // Do stuff
+                                  }}>
+                                  <source src={`${KURRENTTV_BASE_URL}/proxy/0000/${item['id']}.mp4`} type="video/webm"/>
+                                </Video>
+                               {/*<i style={{ position:'absolute' ,top:'50%' ,left:'50%' ,fontSize:'50px' ,margin:'-25px 0 0 -20px'}} className="fa fa-play-circle"></i>*/}
                               </div>
                               <Link to={`/asset/${item['id']}`}><h5>{this.subTitleFormat(item['title'])}</h5></Link>
                                 {this.assetStatusFlag(item['status'])}
