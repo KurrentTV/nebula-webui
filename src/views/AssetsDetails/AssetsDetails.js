@@ -173,7 +173,7 @@ class Details extends Component {
                         <Video
                           autoPlay={false}
                           controls={['PlayPause', 'Seek', 'Time', 'Volume', 'Fullscreen']}
-                          poster="https://i.kinja-img.com/gawker-media/image/upload/s--Lbtqb63d--/c_scale,f_auto,fl_progressive,q_80,w_800/mufdyjsh6g83tj5hl7rz.png"
+                          poster={`${KURRENTTV_BASE_URL}/thumb/0000/${asset.id}/orig.jpg`}
                           onCanPlayThrough={() => {
                             // Do stuff
                           }}>

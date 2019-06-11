@@ -335,7 +335,7 @@ class Assets extends Component {
                                 <Video
                                   autoPlay={false}
                                   controls={['PlayPause', 'Seek', 'Time', 'Volume', 'Fullscreen']}
-                                  poster="/assets/img/hqdefault.jpg"
+                                  poster={`${KURRENTTV_BASE_URL}/thumb/0000/${item['id']}/orig.jpg`}
                                   onCanPlayThrough={() => {
                                     // Do stuff
                                   }}>
