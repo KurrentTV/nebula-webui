@@ -46,12 +46,12 @@ class Assets extends Component {
       withFirstAndLast: false,
     };
   }
-	
-  subTitleFormat(cell){  
-  	if(cell === "" || cell == 'undefined' || cell == null) 
+
+  subTitleFormat(cell){
+  	if(cell === "" || cell == 'undefined' || cell == null)
   	return "-";
   	else return cell;
-  		
+
   }
   titleFormat(cell, row){
   	if(cell === "" || cell == 'undefined' || cell == null)
@@ -59,13 +59,13 @@ class Assets extends Component {
     else return <Link to={`/asset/${row.id}`}>{cell}</Link>;
   }
   assetStatusFlag(cell){
-  	if(cell === 1) 
+  	if(cell === 1)
   	return <i className='fa fa-circle text-success' />
   	else return <i className='fa fa-circle text-disabled' />
-  		
+
   }
-  folderName(cell){  
-  
+  folderName(cell){
+
   	let folder = '';
   	 if(cell != '')
   	 {
@@ -111,7 +111,7 @@ class Assets extends Component {
 	 }
 	 return folder;
   }
-  secondsToHms(d){  	
+  secondsToHms(d){
   	if(d !== "" && d !== undefined)
   	{
 	   const fps = 25;
@@ -120,14 +120,14 @@ class Assets extends Component {
 	         m = pad2( d % 3600 / 60 ),
 	         s = pad2( d % 60 ),
 	         f = pad2( d % 1 * fps ); // +1 here for one based frame
-	   return `${h}:${m}:${s}:${f}`;	
+	   return `${h}:${m}:${s}:${f}`;
 	}
-	else 
+	else
 		return '00:00:00.00';
-  	
+
 	}
   formatTime(cell){
-  	var date = new Date(cell*1000);  
+  	var date = new Date(cell*1000);
   	var d = date.getDay();
   	var m = date.getMonth();
   	var y = date.getFullYear();
@@ -142,9 +142,9 @@ class Assets extends Component {
     this.setState({ selectedOptions: optionsCookie });
   }
   componentDidMount() {
-    const data = { object_type: 'asset', id_view:1};  
-      NebulaApi.getAssets(data).then(res => {   
-         	
+    const data = { object_type: 'asset', id_view:1};
+      NebulaApi.getAssets(data).then(res => {
+
         var arr = [];
 		    arr.push(res.data.data);
         this.setState({
@@ -154,14 +154,14 @@ class Assets extends Component {
        ).catch( err => {
         console.error(err)
       })
-  }  
-  showLayout = (_layout) => { 
+  }
+  showLayout = (_layout) => {
   	this.setState({
         layout: _layout
       });
   }
-  
-  showOptions = (_showHide) => {   
+
+  showOptions = (_showHide) => {
   	this.setState({
         tableItems: !this.state.tableItems
       });
@@ -174,12 +174,12 @@ class Assets extends Component {
 	else
 	{
 		return "";
-	}  	
+	}
   }
   fpsFormat(cell){
   	if(cell != "" && cell != null &&  typeof cell !== undefined)
   	{
-		var fps = cell.split("/");	
+		var fps = cell.split("/");
 		return fps[0];
 	}
 	else
@@ -193,7 +193,7 @@ class Assets extends Component {
 	   var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
 	   return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i];
   }
-  toggle = (tab) => {  
+  toggle = (tab) => {
     if (this.state.activeTab !== tab) {
       this.setState({
         activeTab: tab,
@@ -246,7 +246,7 @@ class Assets extends Component {
         }
       );
     }
-      
+
   }
   changeSearch = (event) => {
     this.setState({search: event.target.value})
@@ -323,7 +323,9 @@ class Assets extends Component {
         if(finalItems.length > 0)
         {
           _tableData = (
-        <div className="row" style={{border:'1px solid #23282c',paddingTop:'18px'}}>
+            <div className="card">
+              <div className="card-body">
+                <div className="row">
                 {finalItems.map(item =>(
 
                     <Col key={item['id']} xl="2" md="4" sm="6" xs="12" className="mb-4">
@@ -366,7 +368,9 @@ class Assets extends Component {
                     </Col>
 
                       ))}
-          </div>
+            </div>
+            </div>
+            </div>
 
         );
         }
