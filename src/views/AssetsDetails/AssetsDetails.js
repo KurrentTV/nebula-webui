@@ -1,15 +1,9 @@
 import React, { Component } from "react";
 import {
-  Badge,
   Button,
-  ButtonGroup,
-  ButtonToolbar,
   Col,
-  Collapse,
   FormGroup,
   Input,
-  InputGroup,
-  InputGroupAddon,
   Nav,
   NavItem,
   NavLink,
@@ -21,27 +15,13 @@ import {
 import {
   Card,
   CardBody,
-  CardFooter,
-  CardHeader,
-  DropdownItem,
-  DropdownMenu,
-  DropdownToggle,
-  Fade,
-  Form,
-  FormText,
-  FormFeedback,
-  InputGroupText,
   Label,
 } from 'reactstrap';
 
-import ReactDOM from 'react-dom';
-import classNames from 'classnames';
 import moment from 'moment';
 import filesize from 'filesize';
-import { rgbToHex } from '@coreui/coreui-pro/dist/js/coreui-utilities';
 
 import classnames from "classnames";
-import { BootstrapTable, TableHeaderColumn } from "react-bootstrap-table";
 
 // react-html5video
 import { DefaultPlayer as Video } from 'react-html5video';
@@ -50,46 +30,8 @@ import 'react-html5video/dist/styles.css';
 import NebulaApi from "../../utils/api/NebulaApi";
 import { MEDIA_TYPES, CONTENT_TYPES, KURRENTTV_BASE_URL } from "../../utils/Constants";
 
-class ThemeView extends Component {
-  constructor(props) {
-    super(props);
 
-    this.state = {
-      bgColor: 'rgb(255, 255, 255)'
-    }
-  }
-
-  componentDidMount () {
-    const elem = ReactDOM.findDOMNode(this).parentNode.firstChild
-    const color = window.getComputedStyle(elem).getPropertyValue('background-color')
-    this.setState({
-      bgColor: color || this.state.bgColor
-    })
-  }
-
-
-}
-
-class ThemeColor extends Component {
-  // constructor(props) {
-  //   super(props);
-  // }
-  render() {
-
-    // const { className, children, ...attributes } = this.props
-    const { children, className } = this.props
-    const classes = classNames(className, 'theme-color w-75 rounded mb-3')
-
-    return (
-      <Col xl="2" md="4" sm="6" xs="12" className="mb-4">
-        {children}
-        <ThemeView/>
-      </Col>
-    )
-  }
-}
-
-class Details extends Component {
+class AssetDetails extends Component {
   constructor(props) {
     super(props);
 
@@ -101,7 +43,6 @@ class Details extends Component {
     };
 
   }
-
 
   componentDidMount() {
     const id = Number(this.props.match.params.id);
@@ -367,4 +308,4 @@ class Details extends Component {
   }
 }
 
-export default Details;
+export default AssetDetails;
