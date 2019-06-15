@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { filter, map } from 'lodash';
 import { Badge, Button, ButtonGroup, ButtonToolbar, Col, Collapse, FormGroup, Input, InputGroup, InputGroupAddon, Nav, NavItem, NavLink, Row, TabContent, TabPane } from 'reactstrap';
 import classnames from 'classnames';
-import cookie from 'react-cookies';
 import {Card, CardHeader, CardBody} from 'reactstrap';
 import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
 import { DefaultPlayer as Video } from 'react-html5video';
@@ -15,6 +14,7 @@ import 'react-select/dist/react-select.min.css';
 import NebulaApi from '../../utils/api/NebulaApi';
 import {Link} from "react-router-dom";
 import {KURRENTTV_BASE_URL} from "../../utils/Constants";
+import CookiesHelper from '../../utils/CookiesHelper';
 
 const options = displayoptions.DOPTIONS;
 
@@ -138,7 +138,7 @@ class Assets extends Component {
     return formattedTime;
   }
   componentDidMount() {
-    const optionsCookie = cookie.load('assetOptions') || [];
+    const optionsCookie = CookiesHelper.getCookie('assetOptions') || [];
     this.setState({ selectedOptions: optionsCookie });
     const data = { object_type: 'asset', id_view:1};  
       NebulaApi.getAssets(data).then(res => {
@@ -256,7 +256,8 @@ class Assets extends Component {
     this.setState({search: '', finalSearch: ''})
   }
   saveChanges = (selectedOptions) => {
-    cookie.save('assetOptions', selectedOptions);
+    // cookie.save('assetOptions', selectedOptions);
+    CookiesHelper.setCookie('assetOptions', selectedOptions)
     this.setState({ selectedOptions });
   }
 
