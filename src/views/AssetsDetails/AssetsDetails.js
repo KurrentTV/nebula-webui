@@ -165,37 +165,6 @@ class Details extends Component {
           <div className="card-body">
             {isLoaded
               ? (<Row>
-                <Col xs="5" className="mb-4">
-                  <div style={{position: 'relative'}}>
-                    {/*<img style={{ width: '100%'}} src={'https://i.kinja-img.com/gawker-media/image/upload/s--Lbtqb63d--/c_scale,f_auto,fl_progressive,q_80,w_800/mufdyjsh6g83tj5hl7rz.png'} alt="boohoo" className="img-responsive"/>*/}
-                    {asset.id
-                      ? (
-                        <Video
-                          autoPlay={false}
-                          controls={['PlayPause', 'Seek', 'Time', 'Volume', 'Fullscreen']}
-                          poster={`${KURRENTTV_BASE_URL}/thumb/0000/${asset.id}/orig.jpg`}
-                          onCanPlayThrough={() => {
-                            // Do stuff
-                          }}>
-                          <source src={`${KURRENTTV_BASE_URL}/proxy/0000/${asset.id}.mp4`} type="video/webm"/>
-                        </Video>
-                      )
-                      : null
-                    }
-
-                    {/*<i style={{ position:'absolute' ,top:'50%' ,left:'50%' ,fontSize:'100px' ,margin:'-50px 0 0 -40px'}} className="fa fa-play-circle"></i>*/}
-                    <div style={{textAlign: 'center', fontSize: '20px'}}>
-                      <i className="fa fa-flag text-success"/>
-                      <span>  </span>
-                      <i className="fa fa-flag text-secondary"/>
-                      <span>  </span>
-                      <i className="fa fa-flag text-danger"/>
-                      <span>  </span>
-                      <button className="badge badge-block btn-outline-secondary"
-                              disabled>{moment.unix(asset.duration).utc().format('HH:mm:ss.SSS')}</button>
-                    </div>
-                  </div>
-                </Col>
                 <Col xs="7" md="7" className="mb-4">
                   <Nav tabs>
                     <NavItem>
@@ -347,12 +316,47 @@ class Details extends Component {
                     </TabPane>
                   </TabContent>
                 </Col>
-                <Col xs="12" md="12" className="mb-4">
-                  <FormGroup style={{float: 'right'}}>
-                    <Button type="button" color="success" className="mr-1" onClick={this.handleSave}>Save</Button>
-                    <Button type="reset" color="danger" className="mr-1" onClick={this.handleRevert}>Revert</Button>
-                  </FormGroup>
+                <Col xs="5" md="5" className="mb-4">
+                  <Row>
+                    <Col xs="12" md="12" className="mb-4">
+                      <FormGroup style={{float: 'right'}}>
+                        <Button type="button" color="success" className="mr-1" onClick={this.handleSave}>Save</Button>
+                        <Button type="reset" color="danger" className="mr-1" onClick={this.handleRevert}>Revert</Button>
+                      </FormGroup>
+                    </Col>
+                    <Col xs="12" md="12" className="mb-4">
+                      <div style={{position: 'relative'}}>
+                        {asset.id
+                          ? (
+                            <Video
+                              autoPlay={false}
+                              controls={['PlayPause', 'Seek', 'Time', 'Volume', 'Fullscreen']}
+                              poster={`${KURRENTTV_BASE_URL}/thumb/0000/${asset.id}/orig.jpg`}
+                              onCanPlayThrough={() => {
+                                // Do stuff
+                              }}>
+                              <source src={`${KURRENTTV_BASE_URL}/proxy/0000/${asset.id}.mp4`} type="video/webm"/>
+                            </Video>
+                          )
+                          : null
+                        }
+
+                        {/*<i style={{ position:'absolute' ,top:'50%' ,left:'50%' ,fontSize:'100px' ,margin:'-50px 0 0 -40px'}} className="fa fa-play-circle"></i>*/}
+                        <div style={{textAlign: 'center', fontSize: '20px'}}>
+                          <i className="fa fa-flag text-success"/>
+                          <span>  </span>
+                          <i className="fa fa-flag text-secondary"/>
+                          <span>  </span>
+                          <i className="fa fa-flag text-danger"/>
+                          <span>  </span>
+                          <button className="badge badge-block btn-outline-secondary"
+                                  disabled>{moment.unix(asset.duration).utc().format('HH:mm:ss.SSS')}</button>
+                        </div>
+                      </div>
+                    </Col>
+                  </Row>
                 </Col>
+
               </Row>)
               : <div> Loading....</div>
             }

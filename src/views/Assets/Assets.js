@@ -137,14 +137,12 @@ class Assets extends Component {
     var formattedTime = y + '-' + m + '-' + d + ' ' + hours + ':' + minutes.substr(-2);
     return formattedTime;
   }
-  componentWillMount() {
+  componentDidMount() {
     const optionsCookie = cookie.load('assetOptions') || [];
     this.setState({ selectedOptions: optionsCookie });
-  }
-  componentDidMount() {
     const data = { object_type: 'asset', id_view:1};  
-      NebulaApi.getAssets(data).then(res => {   
-         	
+      NebulaApi.getAssets(data).then(res => {
+
         var arr = [];
 		    arr.push(res.data.data);
         this.setState({
@@ -313,7 +311,7 @@ class Assets extends Component {
                 <TableHeaderColumn dataField="duration"  dataFormat={this.secondsToHms}>Duration</TableHeaderColumn>
                 <TableHeaderColumn dataField="ctime" dataFormat={ this.formatTime }>Created</TableHeaderColumn>
                 <TableHeaderColumn dataField="mtime" dataFormat={ this.formatTime }>Modified</TableHeaderColumn>
-                {map(selectedOptions, (item, index) => (<TableHeaderColumn key={index} dataField={item.value} dataFormat={ this.subTitleFormat }>{item.label}</TableHeaderColumn>))
+                {map(selectedOptions, (item, index) => (<TableHeaderColumn key={index} dataField={item.field} dataFormat={ this.subTitleFormat }>{item.label}</TableHeaderColumn>))
                 }
               </BootstrapTable>
         );
@@ -461,7 +459,7 @@ class Assets extends Component {
                   <ButtonGroup className="mr-3" aria-label="First group">
                     <Button onClick={() => { this.showLayout('List'); }} active={layout === 'List'} color="outline-secondary"><i className="fa fa-th-list"></i></Button>
                     <Button onClick={() => { this.showLayout('Grid'); }} active={layout === 'Grid'} color="outline-secondary"><i className="fa fa-th-large"></i></Button>
-                    <Button onClick={() => { this.showOptions(true); }} color="outline-secondary"><i className="fa fa-gear"></i></Button>
+                    <Button onClick={() => { this.showOptions(true); }} color="outline-secondary"><i className="fa fa-cog"></i></Button>
                   </ButtonGroup>
                 </ButtonToolbar>
               </Col>
@@ -494,7 +492,7 @@ class Assets extends Component {
                   <ButtonGroup className="mr-3" aria-label="First group">
                      <Button onClick={() => { this.showLayout('List'); }} active={layout === 'List'} color="outline-secondary"><i className="fa fa-th-list"></i></Button>
                     <Button onClick={() => { this.showLayout('Grid'); }} active={layout === 'Grid'} color="outline-secondary"><i className="fa fa-th-large"></i></Button>
-                    <Button onClick={() => { this.showOptions(true); }} color="outline-secondary"><i className="fa fa-gear"></i></Button>
+                    <Button onClick={() => { this.showOptions(true); }} color="outline-secondary"><i className="fa fa-cog"></i></Button>
                   </ButtonGroup>
                 </ButtonToolbar>
               </Col>
@@ -527,7 +525,7 @@ class Assets extends Component {
                   <ButtonGroup className="mr-3" aria-label="First group">
                      <Button onClick={() => { this.showLayout('List'); }} active={layout === 'List'} color="outline-secondary"><i className="fa fa-th-list"></i></Button>
                     <Button onClick={() => { this.showLayout('Grid'); }} active={layout === 'Grid'} color="outline-secondary"><i className="fa fa-th-large"></i></Button>
-                    <Button onClick={() => { this.showOptions(true); }} color="outline-secondary"><i className="fa fa-gear"></i></Button>
+                    <Button onClick={() => { this.showOptions(true); }} color="outline-secondary"><i className="fa fa-cog"></i></Button>
                   </ButtonGroup>
                 </ButtonToolbar>
               </Col>
@@ -560,7 +558,7 @@ class Assets extends Component {
                   <ButtonGroup className="mr-3" aria-label="First group">
                      <Button onClick={() => { this.showLayout('List'); }} active={layout === 'List'} color="outline-secondary"><i className="fa fa-th-list"></i></Button>
                     <Button onClick={() => { this.showLayout('Grid'); }} active={layout === 'Grid'} color="outline-secondary"><i className="fa fa-th-large"></i></Button>
-                    <Button onClick={() => { this.showOptions(true); }} color="outline-secondary"><i className="fa fa-gear"></i></Button>
+                    <Button onClick={() => { this.showOptions(true); }} color="outline-secondary"><i className="fa fa-cog"></i></Button>
                   </ButtonGroup>
                 </ButtonToolbar>
               </Col>
@@ -593,7 +591,7 @@ class Assets extends Component {
                   <ButtonGroup className="mr-3" aria-label="First group">
                      <Button onClick={() => { this.showLayout('List'); }} active={layout === 'List'} color="outline-secondary"><i className="fa fa-th-list"></i></Button>
                     <Button onClick={() => { this.showLayout('Grid'); }} active={layout === 'Grid'} color="outline-secondary"><i className="fa fa-th-large"></i></Button>
-                    <Button onClick={() => { this.showOptions(true); }} color="outline-secondary"><i className="fa fa-gear"></i></Button>
+                    <Button onClick={() => { this.showOptions(true); }} color="outline-secondary"><i className="fa fa-cog"></i></Button>
                   </ButtonGroup>
                 </ButtonToolbar>
               </Col>
@@ -626,7 +624,7 @@ class Assets extends Component {
                   <ButtonGroup className="mr-3" aria-label="First group">
                      <Button onClick={() => { this.showLayout('List'); }} active={layout === 'List'} color="outline-secondary"><i className="fa fa-th-list"></i></Button>
                     <Button onClick={() => { this.showLayout('Grid'); }} active={layout === 'Grid'} color="outline-secondary"><i className="fa fa-th-large"></i></Button>
-                    <Button onClick={() => { this.showOptions(true); }} color="outline-secondary"><i className="fa fa-gear"></i></Button>
+                    <Button onClick={() => { this.showOptions(true); }} color="outline-secondary"><i className="fa fa-cog"></i></Button>
                   </ButtonGroup>
                 </ButtonToolbar>
               </Col>
@@ -659,7 +657,7 @@ class Assets extends Component {
                   <ButtonGroup className="mr-3" aria-label="First group">
                     <Button onClick={() => { this.showLayout('List'); }} active={layout === 'List'} color="outline-secondary"><i className="fa fa-th-list"></i></Button>
                     <Button onClick={() => { this.showLayout('Grid'); }} active={layout === 'Grid'} color="outline-secondary"><i className="fa fa-th-large"></i></Button>
-                    <Button onClick={() => { this.showOptions(true); }} color="outline-secondary"><i className="fa fa-gear"></i></Button>
+                    <Button onClick={() => { this.showOptions(true); }} color="outline-secondary"><i className="fa fa-cog"></i></Button>
                   </ButtonGroup>
                 </ButtonToolbar>
               </Col>
@@ -692,7 +690,7 @@ class Assets extends Component {
                   <ButtonGroup className="mr-3" aria-label="First group">
                      <Button onClick={() => { this.showLayout('List'); }} active={layout === 'List'} color="outline-secondary"><i className="fa fa-th-list"></i></Button>
                     <Button onClick={() => { this.showLayout('Grid'); }} active={layout === 'Grid'} color="outline-secondary"><i className="fa fa-th-large"></i></Button>
-                    <Button onClick={() => { this.showOptions(true); }} color="outline-secondary"><i className="fa fa-gear"></i></Button>
+                    <Button onClick={() => { this.showOptions(true); }} color="outline-secondary"><i className="fa fa-cog"></i></Button>
                   </ButtonGroup>
                 </ButtonToolbar>
               </Col>
