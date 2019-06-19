@@ -47,6 +47,7 @@ const Charts = React.lazy(() => import('./views/Charts'));
 const Dashboard = React.lazy(() => import('./views/Dashboard'));
 const Assets = React.lazy(() => import('./views/Assets'));
 const AssetsDetails = React.lazy(() => import('./views/AssetsDetails'));
+const AssetCreate = React.lazy(() => import('./views/AssetCreate'));
 const Settings = React.lazy(() => import('./views/Settings'));
 const Copy = React.lazy(() => import('./views/Copy'));
 const CoreUIIcons = React.lazy(() => import('./views/Icons/CoreUIIcons'));
@@ -67,6 +68,7 @@ const routes = [
   { path: '/', name: 'Home', component: DefaultLayout, exact: true },
   { path: '/dashboard', name: 'Dashboard', component: Dashboard },
   { path: '/assets', name: 'Assets', component: Assets },
+  { path: '/asset/add', name: 'Add New Asset', component: AssetCreate },
   { path: '/asset/:id', name: 'Assets Details', component: AssetsDetails },
   { path: '/settings', name: 'Settings', component: Settings },
   { path: '/copy', name: 'Assets Copy', component: Copy },
