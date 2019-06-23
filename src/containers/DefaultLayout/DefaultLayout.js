@@ -65,7 +65,7 @@ class DefaultLayout extends Component {
                         path={route.path}
                         exact={route.exact}
                         name={route.name}
-                        render={props => RequireAuth(<route.component {...props} />)} />
+                        component={RequireAuth(route.component)} />
                     ) : (null);
                   })}
                   <Redirect from="/" to="/dashboard" />

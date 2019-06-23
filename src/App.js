@@ -64,7 +64,6 @@ class App extends Component {
           />
           <Route exact path="/404" name="Page 404" component={RequireNoAuth(Page404)} />
           <Route exact path="/500" name="Page 500" component={RequireNoAuth(Page500)} />
-          {/*<Route component={RequireAuth(Main)} />*/}
           <Route path="/" name="Home" component={RequireAuth(DefaultLayout)} />
         </Switch>
       </HashRouter>
