@@ -20,25 +20,14 @@ import {
 
 import classnames from "classnames";
 
-import NebulaApi from "../../utils/api/NebulaApi";
-import { MEDIA_TYPES, CONTENT_TYPES, KURRENTTV_BASE_URL } from "../../utils/Constants";
-
 const configInitial = {
   values: {
     "siteName": "",
     "nebulaHub": "",
-    "userName": "",
-    "email": "",
-    "password": "",
-    "confirmPassword": ""
   },
   errors: {
     "siteName": "Site name is required",
     "nebulaHub": "Nebula Hub is required",
-    "userName": "Username is required",
-    "email": "Email is required",
-    "password": "Password is required",
-    "confirmPassword": "Password confirmation is required",
   },
 };
 
@@ -121,36 +110,6 @@ class Settings extends Component {
                                   <Label htmlFor="hub">Nebula Hub</Label>
                                   <Input type="text" id="hub" placeholder="Nebula Hub"
                                          value={config.nebulaHub || ''} onChange={this.onChange('nebulaHub')} required/>
-                                </FormGroup>
-                                <FormGroup>
-                                  <Label htmlFor="hub_admin">Nebula Administrator User Name</Label>
-                                  <Input type="text" id="hub_admin" placeholder="Nebula Administrator User Name"
-                                         value={config.userName || ''} onChange={this.onChange('userName')} required/>
-                                </FormGroup>
-                              </Col>
-                            </Row>
-                            <Row>
-                              <Col xs="6">
-                                <FormGroup>
-                                  <Label htmlFor="password">Password</Label>
-                                  <Input type="password" id="password" placeholder="Password"
-                                         onChange={this.onChange('password')} required/>
-                                </FormGroup>
-                              </Col>
-                              <Col xs="6">
-                                <FormGroup>
-                                  <Label htmlFor="password">Password</Label>
-                                  <Input type="password" id="password" placeholder="Confirm Password"
-                                         onChange={this.onChange('confirm_password')} required/>
-                                </FormGroup>
-                              </Col>
-                            </Row><
-                            Row>
-                              <Col xs="12">
-                                <FormGroup>
-                                  <Label htmlFor="password">Email</Label>
-                                  <Input type="password" id="email" placeholder="Email"
-                                         onChange={this.onChange('email')} required/>
                                 </FormGroup>
                               </Col>
                             </Row>
