@@ -8,11 +8,12 @@ export default class NebulaApi {
   fetching user data.
   */
   static authenticate(loginData) {
-    loginData = {
-      login: API_USERNAME,
-      password: API_PASSWORD,
-      api: API_VERSION
-    };
+    // loginData = {
+    //   login: API_USERNAME,
+    //   password: API_PASSWORD,
+    //   api: API_VERSION
+    // };
+    loginData.api = API_VERSION;
 
     return axios({
       url: LOGIN_URL,

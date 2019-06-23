@@ -18,6 +18,8 @@ import {
 import navigation from '../../_nav';
 // routes config
 import routes from '../../routes';
+import RequireAuth from "../../components/RequireAuth";
+import CookiesHelper from '../../utils/CookiesHelper';
 
 const DefaultAside = React.lazy(() => import('./DefaultAside'));
 const DefaultFooter = React.lazy(() => import('./DefaultFooter'));
@@ -28,6 +30,8 @@ class DefaultLayout extends Component {
 
   signOut(e) {
     e.preventDefault()
+    CookiesHelper.removeCookie('session_id');
+    CookiesHelper.removeCookie('is_admin');
     this.props.history.push('/login')
   }
 
@@ -61,9 +65,7 @@ class DefaultLayout extends Component {
                         path={route.path}
                         exact={route.exact}
                         name={route.name}
-                        render={props => (
-                          <route.component {...props} />
-                        )} />
+                        render={props => RequireAuth(<route.component {...props} />)} />
                     ) : (null);
                   })}
                   <Redirect from="/" to="/dashboard" />
