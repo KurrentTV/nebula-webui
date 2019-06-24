@@ -45,7 +45,7 @@ class DefaultHeader extends Component {
             <Link to="/copy">Copy</Link>
           </NavItem>
           <NavItem className="px-3">
-            <NavLink href="#">Jobs</NavLink>
+            <Link to="/jobs">Jobs</Link>
           </NavItem>
           <NavItem className="px-3">
             <NavLink href="#">Scheduler</NavLink>
