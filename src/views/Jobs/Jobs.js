@@ -111,7 +111,7 @@ class Jobs extends Component {
           <TableHeaderColumn dataField="ctime" dataFormat={ this.formatTime }>Created</TableHeaderColumn>
           <TableHeaderColumn dataField="stime" dataFormat={this.formatTime}>Started</TableHeaderColumn>
           <TableHeaderColumn dataField="etime" dataFormat={ this.formatTime }>Finished</TableHeaderColumn>
-          <TableHeaderColumn dataField="progress" dataFormat={this.secondsToHms}>Progress</TableHeaderColumn>
+          <TableHeaderColumn dataField="progress" dataFormat={this.progress}>Progress Bar</TableHeaderColumn>
           <TableHeaderColumn dataField="message" width={'450px'}>Message</TableHeaderColumn>
         </BootstrapTable>
       );
