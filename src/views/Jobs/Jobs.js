@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
-import { Col, Row, Progress } from 'reactstrap';
+import { find } from 'lodash';
+import {Button, Progress, Col, Nav, NavItem, NavLink, Row, TabContent, TabPane, ButtonGroup} from 'reactstrap';
+import classnames from 'classnames';
 import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
 import NebulaApi from '../../utils/api/NebulaApi';
 
@@ -9,9 +11,19 @@ class Jobs extends Component {
     super(props);
 
     this.getJobTitle = this.getJobTitle.bind(this);
+    this.handleAbort = this.handleAbort.bind(this);
+    this.handleReload = this.handleReload.bind(this);
+    this.toggle = this.toggle.bind(this);
     this.state = {
+      activeTab: 'Active',
       items: [],
+      assets: [],
+      assetCount: 0,
+      assetCountStatus: false,
       isLoaded: false,
+      tableItems: false,
+      search: '',
+      selectedOption: [],
     };
 
     this.options = {
@@ -25,37 +37,6 @@ class Jobs extends Component {
     };
   }
 
-  secondsToHms(d){
-    if(d !== "" && d !== undefined)
-    {
-      const fps = 25;
-      const pad2 = txt => ( '0' + Math.floor( txt ) ).substr( -2 ),
-        h = pad2( d / 3600 ),
-        m = pad2( d % 3600 / 60 ),
-        s = pad2( d % 60 ),
-        f = pad2( d % 1 * fps ); // +1 here for one based frame
-      return `${h}:${m}:${s}:${f}`;
-    }
-    else
-      return '00:00:00.00';
-
-  }
-  getJobTitle(cell){
-    return cell;
-  }
-  jobAction(cell)
-  {
-    return 'Proxy';
-  }
-  progress(cell)
-  {
-    return (
-      <div>
-        <strong>({cell}%)</strong>
-        <Progress className="progress-xs mt-2" color="success" value={cell} />
-      </div>
-    )
-  }
   formatTime(cell){
     var date = new Date(cell*1000);
     var d = date.getDay();
@@ -68,7 +49,17 @@ class Jobs extends Component {
     return formattedTime;
   }
   componentDidMount() {
-    const data = { view:'finished'};
+    const assets = { object_type: 'asset'};
+    const data = { view: 'active'};
+    NebulaApi.getAssets(assets).then(res => {
+      this.setState({
+        assetCount: res.data.count,
+        assetCountStatus: true,
+        assets: res.data && res.data.data || []
+      })}
+    ).catch( err => {
+      console.error(err)
+    });
     NebulaApi.getLatestJobs(data).then(res => {
 
       var arr = [];
@@ -80,39 +71,110 @@ class Jobs extends Component {
     ).catch( err => {
       console.error(err)
     })
-  }
 
-  render() {
-    var foldetStyle = {
-      padding:'5px',
-      color: 'eee'
+  }
+  handleReload(id) {
+    const data = {restart: [id]};
+    NebulaApi.getLatestJobs(data).then(res => {
+      console.log('Reloaded', res)
+    }).catch( err => {
+      console.error(err)
+    })
+    console.log('handleReload', id);
+  }
+  handleAbort(id) {
+    const data = {abort: [id]};
+    NebulaApi.getLatestJobs(data).then(res => {
+      console.log('Aborted', res)
+    }).catch( err => {
+      console.error(err)
+    })
+  }
+  toggle = (tab) => {
+    if (this.state.activeTab !== tab) {
+      this.setState({
+        activeTab: tab,
+        tableItems: false,
+        isLoaded: false
+      });
+
+      let viewType = 'active';
+      switch (tab) {
+        case "Active":
+          viewType = 'active';
+          break;
+        case "Finished":
+          viewType = 'finished';
+          break;
+        case "Failed":
+          viewType = 'failed';
+          break;
+        default:
+          viewType = 'active';
+      }
+
+      const data = { view: viewType };
+      NebulaApi.getLatestJobs(data).then(
+        response => {
+          var arr = [];
+          arr.push(response.data.data);
+          this.setState({
+            items: arr,
+            isLoaded: true
+          });
+        },
+        error => {
+          console.log(error);
+        }
+      );
     }
-    var {items,isLoaded,finalSearch} = this.state;
+
+  }
+  getJobTitle = (assets) => (cell) => {
+    const asset = find(assets, (item) => item.id === cell);
+    return asset ? asset.title: cell;
+  }
+  jobAction(cell)
+  {
+    return 'Proxy';
+  }
+  actions = (actionReload, actionAbort) => (cell, row) => {
+    return (
+      <ButtonGroup className="mr-3" aria-label="First group">
+        <Button color="success" className="float-right" onClick={() => this.handleReload(cell)}><i className="icon-refresh icons"></i></Button>
+        <Button color="danger" className="float-right" onClick={() => this.handleAbort(cell)}><i className="fa fa-times"></i></Button>
+      </ButtonGroup>
+    )
+  }
+  progress(cell)
+  {
+    return (
+      <div>
+        <strong>({cell}%)</strong>
+        <Progress className="progress-xs mt-2" color="success" value={cell} />
+      </div>
+    )
+  }
+  render() {
+    var {activeTab,items,isLoaded,tableItems, assets} = this.state;
     let _tableData;
+    if(tableItems===true){
+
+    }
     if(isLoaded === true)
     {
-      var style = {
-        width:'100%'
-      };
-      var stImg = {
-        position:'absolute',
-        top:'50%',
-        left:'50%',
-        fontSize:'50px',
-        margin:'-25px 0px 0px -20px'
-      }
       let finalItems = items[0]
-
 
       _tableData = (
         <BootstrapTable data={finalItems} version="4" style={{border:'1px solid #23282c'}} striped hover pagination options={this.options} className="jobsTable">
-          <TableHeaderColumn isKey dataField="id" dataFormat={ this.getJobTitle } width={'50px'}>ID</TableHeaderColumn>
+          <TableHeaderColumn isKey dataField="id" dataFormat={ this.getJobTitle(assets) } width={'200px'}>Title</TableHeaderColumn>
           <TableHeaderColumn dataField="id_action" dataFormat={ this.jobAction }>Action</TableHeaderColumn>
           <TableHeaderColumn dataField="ctime" dataFormat={ this.formatTime }>Created</TableHeaderColumn>
           <TableHeaderColumn dataField="stime" dataFormat={this.formatTime}>Started</TableHeaderColumn>
           <TableHeaderColumn dataField="etime" dataFormat={ this.formatTime }>Finished</TableHeaderColumn>
-          <TableHeaderColumn dataField="progress" dataFormat={this.progress}>Progress Bar</TableHeaderColumn>
-          <TableHeaderColumn dataField="message" width={'450px'}>Message</TableHeaderColumn>
+          <TableHeaderColumn dataField="progress" dataFormat={this.progress} thStyle={{whiteSpace: 'nowrap', textOverflow: 'unset'}}>Progress Bar</TableHeaderColumn>
+          <TableHeaderColumn dataField="message" width={'350px'}>Message</TableHeaderColumn>
+          <TableHeaderColumn dataField="id" dataFormat={this.actions(this.handleReload, this.handleAbort)} tdStyle={{textOverflow: 'unset'}}>Actions</TableHeaderColumn>
         </BootstrapTable>
       );
     }
@@ -127,7 +189,43 @@ class Jobs extends Component {
           <div className="card-body">
             <Row>
               <Col xs="12" className="mb-4">
-                {_tableData}
+                <Nav tabs>
+                  <NavItem>
+                    <NavLink
+                      className={classnames({ active: this.state.activeTab === 'Active' })}
+                      onClick={() => { this.toggle('Active'); }}
+                    >
+                      Active
+                    </NavLink>
+                  </NavItem>
+                  <NavItem>
+                    <NavLink
+                      className={classnames({ active: this.state.activeTab === 'Finished' })}
+                      onClick={() => { this.toggle('Finished'); }}
+                    >
+                      Finished
+                    </NavLink>
+                  </NavItem>
+                  <NavItem>
+                    <NavLink
+                      className={classnames({ active: this.state.activeTab === 'Failed' })}
+                      onClick={() => { this.toggle('Failed'); }}
+                    >
+                      Failed
+                    </NavLink>
+                  </NavItem>
+                </Nav>
+                <TabContent activeTab={this.state.activeTab}>
+                  <TabPane tabId="Active">
+                    {_tableData}
+                  </TabPane>
+                  <TabPane tabId="Finished">
+                    {_tableData}
+                  </TabPane>
+                  <TabPane tabId="Failed">
+                    {_tableData}
+                  </TabPane>
+                </TabContent>
               </Col>
             </Row>
           </div>
