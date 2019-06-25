@@ -322,7 +322,9 @@ class Assets extends Component {
         if(finalItems.length > 0)
         {
           _tableData = (
-        <div className="row" style={{border:'1px solid #23282c',paddingTop:'18px'}}>
+            <div className="card">
+              <div className="card-body">
+                <div className="row">
                 {finalItems.map(item =>(
 
                     <Col key={item['id']} xl="2" md="4" sm="6" xs="12" className="mb-4">
@@ -365,7 +367,9 @@ class Assets extends Component {
                     </Col>
 
                       ))}
-          </div>
+                </div>
+              </div>
+            </div>
 
         );
         }
