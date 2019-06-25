@@ -502,7 +502,7 @@ class Assets extends Component {
                 </ButtonToolbar>
               </Col>
               <Col sm="4" className="d-none d-sm-inline-block">
-                <Button color="primary" className="float-left"><i className="fa fa-plus"></i> Add New Asset</Button>
+                <Link to="/asset/add"><Button color="primary" className="float-left"><i className="fa fa-plus"></i> Add New Asset</Button></Link>
               </Col>
               <Col md="4">
               <FormGroup className="float-right">
@@ -535,7 +535,7 @@ class Assets extends Component {
                 </ButtonToolbar>
               </Col>
               <Col sm="4" className="d-none d-sm-inline-block">
-                <Button color="primary" className="float-left"><i className="fa fa-plus"></i> Add New Asset</Button>
+                <Link to="/asset/add"><Button color="primary" className="float-left"><i className="fa fa-plus"></i> Add New Asset</Button></Link>
               </Col>
               <Col md="4">
               <FormGroup className="float-right">
@@ -568,7 +568,7 @@ class Assets extends Component {
                 </ButtonToolbar>
               </Col>
               <Col sm="4" className="d-none d-sm-inline-block">
-                <Button color="primary" className="float-left"><i className="fa fa-plus"></i> Add New Asset</Button>
+                <Link to="/asset/add"><Button color="primary" className="float-left"><i className="fa fa-plus"></i> Add New Asset</Button></Link>
               </Col>
               <Col md="4">
               <FormGroup className="float-right">
@@ -601,7 +601,7 @@ class Assets extends Component {
                 </ButtonToolbar>
               </Col>
               <Col sm="4" className="d-none d-sm-inline-block">
-                <Button color="primary" className="float-left"><i className="fa fa-plus"></i> Add New Asset</Button>
+                <Link to="/asset/add"><Button color="primary" className="float-left"><i className="fa fa-plus"></i> Add New Asset</Button></Link>
               </Col>
               <Col md="4">
               <FormGroup className="float-right">
@@ -634,7 +634,7 @@ class Assets extends Component {
                 </ButtonToolbar>
               </Col>
               <Col sm="4" className="d-none d-sm-inline-block">
-                <Button color="primary" className="float-left"><i className="fa fa-plus"></i> Add New Asset</Button>
+                <Link to="/asset/add"><Button color="primary" className="float-left"><i className="fa fa-plus"></i> Add New Asset</Button></Link>
               </Col>
               <Col md="4">
               <FormGroup className="float-right">
@@ -667,7 +667,7 @@ class Assets extends Component {
                 </ButtonToolbar>
               </Col>
               <Col sm="4" className="d-none d-sm-inline-block">
-                <Button color="primary" className="float-left"><i className="fa fa-plus"></i> Add New Asset</Button>
+                <Link to="/asset/add"><Button color="primary" className="float-left"><i className="fa fa-plus"></i> Add New Asset</Button></Link>
               </Col>
               <Col md="4">
               <FormGroup className="float-right">
@@ -700,7 +700,7 @@ class Assets extends Component {
                 </ButtonToolbar>
               </Col>
               <Col sm="4" className="d-none d-sm-inline-block">
-                <Button color="primary" className="float-left"><i className="fa fa-plus"></i> Add New Asset</Button>
+                <Link to="/asset/add"><Button color="primary" className="float-left"><i className="fa fa-plus"></i> Add New Asset</Button></Link>
               </Col>
               <Col md="4">
               <FormGroup className="float-right">
