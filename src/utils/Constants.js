@@ -1,5 +1,6 @@
 export const COOKIES_MAX_AGE = 365 * 24 * 60 * 60;
 export const KURRENTTV_BASE_URL = 'https://kurrenttv.nbla.cloud';
+export const WS_KURRENTTV_BASE_URL = 'wss://kurrenttv.nbla.cloud/ws/kurrenttv';
 export const LOGIN_URL = '/login';
 export const ASSETS_URL = '/api/get';
 export const SET_ASSETS_URL = '/api/set';

@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
-import { find } from 'lodash';
+import { find, findIndex } from 'lodash';
 import {Button, Progress, Col, Nav, NavItem, NavLink, Row, TabContent, TabPane, ButtonGroup} from 'reactstrap';
 import classnames from 'classnames';
 import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
+import Websocket from 'react-websocket';
 import NebulaApi from '../../utils/api/NebulaApi';
+import {WS_KURRENTTV_BASE_URL} from "../../utils/Constants";
 
 class Jobs extends Component {
 
@@ -21,9 +23,9 @@ class Jobs extends Component {
       assetCount: 0,
       assetCountStatus: false,
       isLoaded: false,
-      tableItems: false,
       search: '',
       selectedOption: [],
+      job_progress: {},
     };
 
     this.options = {
@@ -76,25 +78,23 @@ class Jobs extends Component {
   handleReload(id) {
     const data = {restart: [id]};
     NebulaApi.getLatestJobs(data).then(res => {
-      console.log('Reloaded', res)
+      this.toggle(this.state.activeTab, true);
     }).catch( err => {
       console.error(err)
     })
-    console.log('handleReload', id);
   }
   handleAbort(id) {
     const data = {abort: [id]};
     NebulaApi.getLatestJobs(data).then(res => {
-      console.log('Aborted', res)
+      this.toggle(this.state.activeTab, true);
     }).catch( err => {
       console.error(err)
     })
   }
-  toggle = (tab) => {
-    if (this.state.activeTab !== tab) {
+  toggle = (tab, force = false) => {
+    if (this.state.activeTab !== tab || force) {
       this.setState({
         activeTab: tab,
-        tableItems: false,
         isLoaded: false
       });
 
@@ -155,12 +155,24 @@ class Jobs extends Component {
       </div>
     )
   }
-  render() {
-    var {activeTab,items,isLoaded,tableItems, assets} = this.state;
-    let _tableData;
-    if(tableItems===true){
+  handleData(data) {
+    const { items } = this.state;
+    let result = JSON.parse(data);
+    const itemsData = items[0];
+    if (result[3] === 'job_progress') {
+      const id = result[4] && result[4]['id'];
+      let itemIndex = findIndex(itemsData, i => i.id === id);
 
+      if (itemIndex > -1 && result[4]) {
+        itemsData[itemIndex]['progress'] = result[4]['progress'];
+      }
+      
+      this.setState({items: [itemsData]});
     }
+  }
+  render() {
+    var {activeTab,items,isLoaded, assets} = this.state;
+    let _tableData;
     if(isLoaded === true)
     {
       let finalItems = items[0]
@@ -230,6 +242,8 @@ class Jobs extends Component {
             </Row>
           </div>
         </div>
+        <Websocket url={WS_KURRENTTV_BASE_URL}
+                   onMessage={this.handleData.bind(this)}/>
       </div>
     );
   }
