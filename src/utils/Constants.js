@@ -5,6 +5,7 @@ export const LOGIN_URL = '/login';
 export const ASSETS_URL = '/api/get';
 export const SET_ASSETS_URL = '/api/set';
 export const JOBS_URL = '/api/jobs';
+export const SETTINGS_URL = '/api/settings';
 export const API_USERNAME = 'demo';
 export const API_PASSWORD = 'demo';
 export const API_VERSION = '1'

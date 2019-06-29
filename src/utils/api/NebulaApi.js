@@ -1,4 +1,7 @@
-import { API_USERNAME, API_PASSWORD, API_VERSION, LOGIN_URL, ASSETS_URL ,JOBS_URL, SET_ASSETS_URL } from "../Constants";
+import {
+  API_USERNAME, API_PASSWORD, API_VERSION, LOGIN_URL, ASSETS_URL, JOBS_URL, SET_ASSETS_URL,
+  SETTINGS_URL
+} from "../Constants";
 import axios from "axios";
 
 export default class NebulaApi {
@@ -46,6 +49,13 @@ export default class NebulaApi {
   static getJobbyId(data) {
     return axios({
       url: JOBS_URL,
+      method: "POST",
+      data
+    });
+  }
+  static getSettings(data) {
+    return axios({
+      url: SETTINGS_URL,
       method: "POST",
       data
     });

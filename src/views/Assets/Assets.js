@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { filter, map } from 'lodash';
+import { filter, map, isEmpty, findIndex, forEach } from 'lodash';
 import { Badge, Button, ButtonGroup, ButtonToolbar, Col, Collapse, FormGroup, Input, InputGroup, InputGroupAddon, Nav, NavItem, NavLink, Row, TabContent, TabPane } from 'reactstrap';
 import classnames from 'classnames';
 import {Card, CardHeader, CardBody} from 'reactstrap';
@@ -64,51 +64,21 @@ class Assets extends Component {
   	else return <i className='fa fa-circle text-disabled' />
   		
   }
-  folderName(cell){  
+  folderName = (assetFolders) => (cell) => {
   
-  	let folder = '';
-  	 if(cell != '')
-  	 {
-	 	switch(cell)
-	 	{
-			case 1:
-			folder= <span className='badge' style={{padding:'5px',color:'#eee',background:'#20a8d8'}}> Movie </span>
-			break;
-			case 2:
-			folder= <span className='badge' style={{padding:'5px',color:'#eee',background:'#6610f2'}}> Serie </span>
-			break;
-			case 3:
-			folder= <span className='badge' style={{padding:'5px',color:'#eee',background:'#6f42c1'}}> Story </span>
-			break;
-			case 4:
-			folder= <span className='badge' style={{padding:'5px',color:'#eee',background:'#e83e8c'}}> Song </span>
-			break;
-			case 5:
-			folder= <span className='badge' style={{padding:'5px',color:'#000',background:'#f86c6b'}}> Fill </span>
-			break;
-			case 6:
-			folder= <span className='badge' style={{padding:'5px',color:'#fff',background:'#A30E02'}}> Trailer </span>
-			break;
-			case 7:
-			folder= <span className='badge' style={{padding:'5px',color:'#000',background:'#E09C2D'}}> Jingle </span>
-			break;
-			case 8:
-			folder= <span className='badge' style={{padding:'5px',color:'#eee',background:'#4dbd74'}}> Graphics </span>
-			break;
-			case 9:
-			folder= <span className='badge' style={{padding:'5px',color:'#eee',background:'#17a2b8'}}> Commercial </span>
-			break;
-			case 10:
-			folder= <span className='badge' style={{padding:'5px',color:'#eee',background:'#73818f'}}> Teleshopping </span>
-			break;
-			case 11:
-			folder= <span className='badge' style={{padding:'5px',color:'#eee',background:'#2f353a'}}> Dataset </span>
-			break;
-			case 12:
-			folder= <span className='badge' style={{padding:'5px',color:'#eee',background:'#F63C3A'}}> Incoming </span>
-			break;
-		}
-	 }
+  let folder = '';
+  if(cell != '')
+  {
+		let folderItem = null;
+    forEach(assetFolders, (folder, index) => {
+      if (Number(index) === cell) {
+        folderItem = folder;
+      }
+    });
+    if (folderItem) {
+      folder= <span className='badge' style={{padding:'5px',color:'#eee',background: `#${folderItem.color.toString(16)}`}}> {folderItem.title} </span>
+    }
+  }
 	 return folder;
   }
   secondsToHms(d){  	
@@ -139,19 +109,40 @@ class Assets extends Component {
   }
   componentDidMount() {
     const optionsCookie = CookiesHelper.getCookie('assetOptions') || [];
+    const assetViews = localStorage.getItem('assetViews') ? JSON.parse(localStorage.getItem('assetViews')) || {} : {};
+    const assetFolders = localStorage.getItem('assetFolders') ? JSON.parse(localStorage.getItem('assetFolders')) || {} : {};
     this.setState({ selectedOptions: optionsCookie });
-    const data = { object_type: 'asset', id_view:1};  
-      NebulaApi.getAssets(data).then(res => {
+    let data = { object_type: 'asset', id_view:1};
+    NebulaApi.getAssets(data).then(res => {
 
-        var arr = [];
-		    arr.push(res.data.data);
-        this.setState({
-          items: arr,
-          isLoaded: true
-        })}
-       ).catch( err => {
+      var arr = [];
+      arr.push(res.data.data);
+      this.setState({
+        items: arr,
+        isLoaded: true
+      })}
+     ).catch( err => {
+      console.error(err)
+    })
+    data = { user: 'demo'};
+
+    if (isEmpty(assetViews) || isEmpty(assetFolders)) {
+      NebulaApi.getSettings(data).then(res => {
+          let assetViews = res.data && res.data.data && res.data.data.views || [];
+          let assetFolders = res.data && res.data.data && res.data.data.folders || [];
+          this.setState({
+            assetViews, assetFolders
+          })
+          localStorage.setItem('assetViews', JSON.stringify(assetViews));
+          localStorage.setItem('assetFolders', JSON.stringify(assetFolders));
+        }
+      ).catch( err => {
         console.error(err)
       })
+    } else {
+      this.setState({assetViews, assetFolders});
+    }
+
   }  
   showLayout = (_layout) => { 
   	this.setState({
@@ -200,35 +191,13 @@ class Assets extends Component {
       });
 
       let viewType = 1;
-      switch (tab) {
-        case "Main":
-          viewType = 1;
-          break;
-        case "Fill":
-          viewType = 2;
-          break;
-        case "Music":
-          viewType = 3;
-          break;
-        case "Stories":
-          viewType = 4;
-          break;
-        case "Commercial":
-          viewType = 5;
-          break;
-        case "Incoming":
-          viewType = 13;
-          break;
-        case "Archive":
-          viewType = 12;
-          break;
-        case "Trash":
-          viewType = 11;
-          break;
-        default:
-          viewType = 1;
-      }
 
+      forEach(this.state.assetViews, (view, index) => {
+        console.log('view', view, tab, view.title === tab);
+        if (view.title === tab) {
+          viewType = parseInt(index);
+        }
+      });
       const data = { object_type: "asset", id_view: viewType };
       NebulaApi.getAssets(data).then(
         response => {
@@ -266,7 +235,7 @@ class Assets extends Component {
       padding:'5px',
       color: 'eee'
     }
-    var {activeTab,items,isLoaded,tableItems,layout,search,finalSearch,selectedOptions} = this.state;
+    var {activeTab,items,isLoaded,tableItems,layout,search,finalSearch,selectedOptions, assetFolders, assetViews} = this.state;
     let formItems;let _tableData;
     if(tableItems===true){
 
@@ -307,7 +276,7 @@ class Assets extends Component {
                 <TableHeaderColumn isKey dataField="title" dataFormat={ this.titleFormat }>Title</TableHeaderColumn>
                  <TableHeaderColumn dataField="subtitle" dataFormat={ this.subTitleFormat }>Sub Title</TableHeaderColumn>
                 <TableHeaderColumn dataField="idec" dataFormat={ this.subTitleFormat }>IDEC</TableHeaderColumn>
-                <TableHeaderColumn dataField="id_folder" dataFormat={this.folderName}>Folder</TableHeaderColumn>
+                <TableHeaderColumn dataField="id_folder" dataFormat={this.folderName(assetFolders)}>Folder</TableHeaderColumn>
                 <TableHeaderColumn dataField="gener" dataFormat={ this.subTitleFormat }>Genre</TableHeaderColumn>
                 <TableHeaderColumn dataField="duration"  dataFormat={this.secondsToHms}>Duration</TableHeaderColumn>
                 <TableHeaderColumn dataField="ctime" dataFormat={ this.formatTime }>Created</TableHeaderColumn>
@@ -391,336 +360,52 @@ class Assets extends Component {
         <Row>
           <Col xs="12" className="mb-4">
             <Nav tabs>
-              <NavItem>
-                <NavLink
-                  className={classnames({ active: this.state.activeTab === 'Main' })}
-                  onClick={() => { this.toggle('Main'); }}
-                >
-                  Main
-                </NavLink>
-              </NavItem>
-              <NavItem>
-                <NavLink
-                  className={classnames({ active: this.state.activeTab === 'Fill' })}
-                  onClick={() => { this.toggle('Fill'); }}
-                >
-                  Fill
-                </NavLink>
-              </NavItem>
-              <NavItem>
-                <NavLink
-                  className={classnames({ active: this.state.activeTab === 'Music' })}
-                  onClick={() => { this.toggle('Music'); }}
-                >
-                  Music
-                </NavLink>
-              </NavItem>
-              <NavItem>
-                <NavLink
-                  className={classnames({ active: this.state.activeTab === 'Stories' })}
-                  onClick={() => { this.toggle('Stories'); }}
-                >
-                  Stories
-                </NavLink>
-              </NavItem>
-              <NavItem>
-                <NavLink
-                  className={classnames({ active: this.state.activeTab === 'Commercial' })}
-                  onClick={() => { this.toggle('Commercial'); }}
-                >
-                  Commercial
-                </NavLink>
-              </NavItem>
-              <NavItem>
-                <NavLink
-                  className={classnames({ active: this.state.activeTab === 'Incoming' })}
-                  onClick={() => { this.toggle('Incoming'); }}
-                >
-                  Incoming
-                </NavLink>
-              </NavItem>
-              <NavItem>
-                <NavLink
-                  className={classnames({ active: this.state.activeTab === 'Archive' })}
-                  onClick={() => { this.toggle('Archive'); }}
-                >
-                  Archive
-                </NavLink>
-              </NavItem>
-              <NavItem>
-                <NavLink
-                  className={classnames({ active: this.state.activeTab === 'Trash' })}
-                  onClick={() => { this.toggle('Trash'); }}
-                >
-                  Trash
-                </NavLink>
-              </NavItem>
+              {map(assetViews, (view) => (<NavItem key={view.title}>
+                  <NavLink
+                    className={classnames({ active: this.state.activeTab === view.title })}
+                    onClick={() => { this.toggle(view.title); }}
+                  >
+                    {view.title}
+                  </NavLink>
+                </NavItem>)
+              )}
             </Nav>
             <TabContent activeTab={this.state.activeTab}>
-              <TabPane tabId="Main">
-              <Row>
-              <Col sm="4" className="d-none d-sm-inline-block">
-                <ButtonToolbar className="float-left" aria-label="Toolbar with button groups">
-                  <ButtonGroup className="mr-3" aria-label="First group">
-                    <Button onClick={() => { this.showLayout('List'); }} active={layout === 'List'} color="outline-secondary"><i className="fa fa-th-list"></i></Button>
-                    <Button onClick={() => { this.showLayout('Grid'); }} active={layout === 'Grid'} color="outline-secondary"><i className="fa fa-th-large"></i></Button>
-                    <Button onClick={() => { this.showOptions(true); }} color="outline-secondary"><i className="fa fa-cog"></i></Button>
-                  </ButtonGroup>
-                </ButtonToolbar>
-              </Col>
-              <Col sm="4" className="d-none d-sm-inline-block">
-                <Link to="/asset/add"><Button color="primary" className="float-left"><i className="fa fa-plus"></i> Add New Asset</Button></Link>
-              </Col>
-              <Col md="4">
-              <FormGroup className="float-right">
-                <InputGroup>
-                  <InputGroupAddon addonType="prepend">
-                    <Button type="button" color="btn btn-outline-dark btn-block" onClick={this.applySearch}><i className="fa fa-search"></i></Button>
-                  </InputGroupAddon>
-                  <Input type="text" id="input3-group2" name="input3-group2" placeholder="Search" value={search} onChange={this.changeSearch} />
-                  <InputGroupAddon addonType="append">
-                    <Button type="button" color="btn btn-outline-dark btn-block" onClick={this.resetSearch}><i className="fa fa-times"></i></Button>
-                  </InputGroupAddon>
-                </InputGroup>
-              </FormGroup>
-              </Col>
-              <Col md="4">
-             {formItems}
-              </Col>
-              </Row>
-              {_tableData}
-              </TabPane>
-              <TabPane tabId="Fill">
-              <Row>
-              <Col sm="4" className="d-none d-sm-inline-block">
-                <ButtonToolbar className="float-left" aria-label="Toolbar with button groups">
-                  <ButtonGroup className="mr-3" aria-label="First group">
-                     <Button onClick={() => { this.showLayout('List'); }} active={layout === 'List'} color="outline-secondary"><i className="fa fa-th-list"></i></Button>
-                    <Button onClick={() => { this.showLayout('Grid'); }} active={layout === 'Grid'} color="outline-secondary"><i className="fa fa-th-large"></i></Button>
-                    <Button onClick={() => { this.showOptions(true); }} color="outline-secondary"><i className="fa fa-cog"></i></Button>
-                  </ButtonGroup>
-                </ButtonToolbar>
-              </Col>
-              <Col sm="4" className="d-none d-sm-inline-block">
-                <Link to="/asset/add"><Button color="primary" className="float-left"><i className="fa fa-plus"></i> Add New Asset</Button></Link>
-              </Col>
-              <Col md="4">
-              <FormGroup className="float-right">
-                <InputGroup>
-                  <InputGroupAddon addonType="prepend">
-                    <Button type="button" color="btn btn-outline-dark btn-block"><i className="fa fa-search"></i></Button>
-                  </InputGroupAddon>
-                  <Input type="text" id="input3-group2" name="input3-group2" placeholder="Search" />
-                  <InputGroupAddon addonType="append">
-                    <Button type="button" color="btn btn-outline-dark btn-block"><i className="fa fa-times"></i></Button>
-                  </InputGroupAddon>
-                </InputGroup>
-              </FormGroup>
-              </Col>
-              <Col md="4">
-              {formItems}
-              </Col>
-              </Row>
-              {_tableData}
-              </TabPane>
-              <TabPane tabId="Music">
-              <Row>
-              <Col sm="4" className="d-none d-sm-inline-block">
-                <ButtonToolbar className="float-left" aria-label="Toolbar with button groups">
-                  <ButtonGroup className="mr-3" aria-label="First group">
-                     <Button onClick={() => { this.showLayout('List'); }} active={layout === 'List'} color="outline-secondary"><i className="fa fa-th-list"></i></Button>
-                    <Button onClick={() => { this.showLayout('Grid'); }} active={layout === 'Grid'} color="outline-secondary"><i className="fa fa-th-large"></i></Button>
-                    <Button onClick={() => { this.showOptions(true); }} color="outline-secondary"><i className="fa fa-cog"></i></Button>
-                  </ButtonGroup>
-                </ButtonToolbar>
-              </Col>
-              <Col sm="4" className="d-none d-sm-inline-block">
-                <Link to="/asset/add"><Button color="primary" className="float-left"><i className="fa fa-plus"></i> Add New Asset</Button></Link>
-              </Col>
-              <Col md="4">
-              <FormGroup className="float-right">
-                <InputGroup>
-                  <InputGroupAddon addonType="prepend">
-                    <Button type="button" color="btn btn-outline-dark btn-block"><i className="fa fa-search"></i></Button>
-                  </InputGroupAddon>
-                  <Input type="text" id="input3-group2" name="input3-group2" placeholder="Search" />
-                  <InputGroupAddon addonType="append">
-                    <Button type="button" color="btn btn-outline-dark btn-block"><i className="fa fa-times"></i></Button>
-                  </InputGroupAddon>
-                </InputGroup>
-              </FormGroup>
-              </Col>
-              <Col md="4">
-              {formItems}
-              </Col>
-              </Row>
-              {_tableData}
-              </TabPane>
-              <TabPane tabId="Stories">
-              <Row>
-              <Col sm="4" className="d-none d-sm-inline-block">
-                <ButtonToolbar className="float-left" aria-label="Toolbar with button groups">
-                  <ButtonGroup className="mr-3" aria-label="First group">
-                     <Button onClick={() => { this.showLayout('List'); }} active={layout === 'List'} color="outline-secondary"><i className="fa fa-th-list"></i></Button>
-                    <Button onClick={() => { this.showLayout('Grid'); }} active={layout === 'Grid'} color="outline-secondary"><i className="fa fa-th-large"></i></Button>
-                    <Button onClick={() => { this.showOptions(true); }} color="outline-secondary"><i className="fa fa-cog"></i></Button>
-                  </ButtonGroup>
-                </ButtonToolbar>
-              </Col>
-              <Col sm="4" className="d-none d-sm-inline-block">
-                <Link to="/asset/add"><Button color="primary" className="float-left"><i className="fa fa-plus"></i> Add New Asset</Button></Link>
-              </Col>
-              <Col md="4">
-              <FormGroup className="float-right">
-                <InputGroup>
-                  <InputGroupAddon addonType="prepend">
-                    <Button type="button" color="btn btn-outline-dark btn-block"><i className="fa fa-search"></i></Button>
-                  </InputGroupAddon>
-                  <Input type="text" id="input3-group2" name="input3-group2" placeholder="Search" />
-                  <InputGroupAddon addonType="append">
-                    <Button type="button" color="btn btn-outline-dark btn-block"><i className="fa fa-times"></i></Button>
-                  </InputGroupAddon>
-                </InputGroup>
-              </FormGroup>
-              </Col>
-              <Col md="4">
-              {formItems}
-              </Col>
-              </Row>
-              {_tableData}
-              </TabPane>
-              <TabPane tabId="Commercial">
-              <Row>
-              <Col sm="4" className="d-none d-sm-inline-block">
-                <ButtonToolbar className="float-left" aria-label="Toolbar with button groups">
-                  <ButtonGroup className="mr-3" aria-label="First group">
-                     <Button onClick={() => { this.showLayout('List'); }} active={layout === 'List'} color="outline-secondary"><i className="fa fa-th-list"></i></Button>
-                    <Button onClick={() => { this.showLayout('Grid'); }} active={layout === 'Grid'} color="outline-secondary"><i className="fa fa-th-large"></i></Button>
-                    <Button onClick={() => { this.showOptions(true); }} color="outline-secondary"><i className="fa fa-cog"></i></Button>
-                  </ButtonGroup>
-                </ButtonToolbar>
-              </Col>
-              <Col sm="4" className="d-none d-sm-inline-block">
-                <Link to="/asset/add"><Button color="primary" className="float-left"><i className="fa fa-plus"></i> Add New Asset</Button></Link>
-              </Col>
-              <Col md="4">
-              <FormGroup className="float-right">
-                <InputGroup>
-                  <InputGroupAddon addonType="prepend">
-                    <Button type="button" color="btn btn-outline-dark btn-block"><i className="fa fa-search"></i></Button>
-                  </InputGroupAddon>
-                  <Input type="text" id="input3-group2" name="input3-group2" placeholder="Search" />
-                  <InputGroupAddon addonType="append">
-                    <Button type="button" color="btn btn-outline-dark btn-block"><i className="fa fa-times"></i></Button>
-                  </InputGroupAddon>
-                </InputGroup>
-              </FormGroup>
-              </Col>
-              <Col md="4">
-              {formItems}
-              </Col>
-              </Row>
-              {_tableData}
-              </TabPane>
-              <TabPane tabId="Incoming">
-              <Row>
-              <Col sm="4" className="d-none d-sm-inline-block">
-                <ButtonToolbar className="float-left" aria-label="Toolbar with button groups">
-                  <ButtonGroup className="mr-3" aria-label="First group">
-                     <Button onClick={() => { this.showLayout('List'); }} active={layout === 'List'} color="outline-secondary"><i className="fa fa-th-list"></i></Button>
-                    <Button onClick={() => { this.showLayout('Grid'); }} active={layout === 'Grid'} color="outline-secondary"><i className="fa fa-th-large"></i></Button>
-                    <Button onClick={() => { this.showOptions(true); }} color="outline-secondary"><i className="fa fa-cog"></i></Button>
-                  </ButtonGroup>
-                </ButtonToolbar>
-              </Col>
-              <Col sm="4" className="d-none d-sm-inline-block">
-                <Link to="/asset/add"><Button color="primary" className="float-left"><i className="fa fa-plus"></i> Add New Asset</Button></Link>
-              </Col>
-              <Col md="4">
-              <FormGroup className="float-right">
-                <InputGroup>
-                  <InputGroupAddon addonType="prepend">
-                    <Button type="button" color="btn btn-outline-dark btn-block"><i className="fa fa-search"></i></Button>
-                  </InputGroupAddon>
-                  <Input type="text" id="input3-group2" name="input3-group2" placeholder="Search" />
-                  <InputGroupAddon addonType="append">
-                    <Button type="button" color="btn btn-outline-dark btn-block"><i className="fa fa-times"></i></Button>
-                  </InputGroupAddon>
-                </InputGroup>
-              </FormGroup>
-              </Col>
-              <Col md="4">
-              {formItems}
-              </Col>
-              </Row>
-              {_tableData}
-              </TabPane>
-              <TabPane tabId="Archive">
-              <Row>
-              <Col sm="4" className="d-none d-sm-inline-block">
-                <ButtonToolbar className="float-left" aria-label="Toolbar with button groups">
-                  <ButtonGroup className="mr-3" aria-label="First group">
-                    <Button onClick={() => { this.showLayout('List'); }} active={layout === 'List'} color="outline-secondary"><i className="fa fa-th-list"></i></Button>
-                    <Button onClick={() => { this.showLayout('Grid'); }} active={layout === 'Grid'} color="outline-secondary"><i className="fa fa-th-large"></i></Button>
-                    <Button onClick={() => { this.showOptions(true); }} color="outline-secondary"><i className="fa fa-cog"></i></Button>
-                  </ButtonGroup>
-                </ButtonToolbar>
-              </Col>
-              <Col sm="4" className="d-none d-sm-inline-block">
-                <Link to="/asset/add"><Button color="primary" className="float-left"><i className="fa fa-plus"></i> Add New Asset</Button></Link>
-              </Col>
-              <Col md="4">
-              <FormGroup className="float-right">
-                <InputGroup>
-                  <InputGroupAddon addonType="prepend">
-                    <Button type="button" color="btn btn-outline-dark btn-block"><i className="fa fa-search"></i></Button>
-                  </InputGroupAddon>
-                  <Input type="text" id="input3-group2" name="input3-group2" placeholder="Search" />
-                  <InputGroupAddon addonType="append">
-                    <Button type="button" color="btn btn-outline-dark btn-block"><i className="fa fa-times"></i></Button>
-                  </InputGroupAddon>
-                </InputGroup>
-              </FormGroup>
-              </Col>
-              <Col md="4">
-              {formItems}
-              </Col>
-              </Row>
-              {_tableData}
-              </TabPane>
-              <TabPane tabId="Trash">
-              <Row>
-              <Col sm="4" className="d-none d-sm-inline-block">
-                <ButtonToolbar className="float-left" aria-label="Toolbar with button groups">
-                  <ButtonGroup className="mr-3" aria-label="First group">
-                     <Button onClick={() => { this.showLayout('List'); }} active={layout === 'List'} color="outline-secondary"><i className="fa fa-th-list"></i></Button>
-                    <Button onClick={() => { this.showLayout('Grid'); }} active={layout === 'Grid'} color="outline-secondary"><i className="fa fa-th-large"></i></Button>
-                    <Button onClick={() => { this.showOptions(true); }} color="outline-secondary"><i className="fa fa-cog"></i></Button>
-                  </ButtonGroup>
-                </ButtonToolbar>
-              </Col>
-              <Col sm="4" className="d-none d-sm-inline-block">
-                <Link to="/asset/add"><Button color="primary" className="float-left"><i className="fa fa-plus"></i> Add New Asset</Button></Link>
-              </Col>
-              <Col md="4">
-              <FormGroup className="float-right">
-                <InputGroup>
-                  <InputGroupAddon addonType="prepend">
-                    <Button type="button" color="btn btn-outline-dark btn-block"><i className="fa fa-search"></i></Button>
-                  </InputGroupAddon>
-                  <Input type="text" id="input3-group2" name="input3-group2" placeholder="Search" />
-                  <InputGroupAddon addonType="append">
-                    <Button type="button" color="btn btn-outline-dark btn-block"><i className="fa fa-times"></i></Button>
-                  </InputGroupAddon>
-                </InputGroup>
-              </FormGroup>
-              </Col>
-              <Col md="4">
-             {formItems}
-              </Col>
-              </Row>
-              {_tableData}
-              </TabPane>
+              {map(assetViews, (view) => {
+                return (<TabPane key={view.title} tabId={view.title}>
+                  <Row>
+                    <Col sm="4" className="d-none d-sm-inline-block">
+                      <ButtonToolbar className="float-left" aria-label="Toolbar with button groups">
+                        <ButtonGroup className="mr-3" aria-label="First group">
+                          <Button onClick={() => { this.showLayout('List'); }} active={layout === 'List'} color="outline-secondary"><i className="fa fa-th-list"></i></Button>
+                          <Button onClick={() => { this.showLayout('Grid'); }} active={layout === 'Grid'} color="outline-secondary"><i className="fa fa-th-large"></i></Button>
+                          <Button onClick={() => { this.showOptions(true); }} color="outline-secondary"><i className="fa fa-cog"></i></Button>
+                        </ButtonGroup>
+                      </ButtonToolbar>
+                    </Col>
+                    <Col sm="4" className="d-none d-sm-inline-block">
+                      <Link to="/asset/add"><Button color="primary" className="float-left"><i className="fa fa-plus"></i> Add New Asset</Button></Link>
+                    </Col>
+                    <Col md="4">
+                      <FormGroup className="float-right">
+                        <InputGroup>
+                          <InputGroupAddon addonType="prepend">
+                            <Button type="button" color="btn btn-outline-dark btn-block" onClick={this.applySearch}><i className="fa fa-search"></i></Button>
+                          </InputGroupAddon>
+                          <Input type="text" id="input3-group2" name="input3-group2" placeholder="Search" value={search} onChange={this.changeSearch} />
+                          <InputGroupAddon addonType="append">
+                            <Button type="button" color="btn btn-outline-dark btn-block" onClick={this.resetSearch}><i className="fa fa-times"></i></Button>
+                          </InputGroupAddon>
+                        </InputGroup>
+                      </FormGroup>
+                    </Col>
+                    <Col md="4">
+                      {formItems}
+                    </Col>
+                  </Row>
+                  {_tableData}
+                </TabPane>)
+              })}
             </TabContent>
           </Col>
         </Row>
