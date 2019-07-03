@@ -1,6 +1,6 @@
 {
-  "name": "Copy",
+  "name": "Jobs",
   "version": "0.0.0",
   "private": true,
-  "main": "./Copy.js"
+  "main": "./Jobs.js"
 }

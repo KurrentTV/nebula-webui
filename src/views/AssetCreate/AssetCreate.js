@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import ReactDOMServer from "react-dom/server";
 import {
   Button,
   Col,
@@ -17,21 +18,32 @@ import {
   CardBody,
   Label,
 } from 'reactstrap';
-
-import moment from 'moment';
-import filesize from 'filesize';
+import DropzoneComponent from 'react-dropzone-component';
+import 'react-dropzone-component/styles/filepicker.css';
+import 'dropzone/dist/min/dropzone.min.css';
 
 import classnames from "classnames";
-
-// react-html5video
-import { DefaultPlayer as Video } from 'react-html5video';
-import 'react-html5video/dist/styles.css';
-
 import NebulaApi from "../../utils/api/NebulaApi";
-import { MEDIA_TYPES, CONTENT_TYPES, KURRENTTV_BASE_URL } from "../../utils/Constants";
 
+var componentConfig = { postUrl: 'no-url' };
+var djsConfig = {
+  // autoProcessQueue: false,
+  previewTemplate: ReactDOMServer.renderToStaticMarkup(
+    <div className="dz-preview dz-file-preview">
+      <div className="dz-details">
+        <div className="dz-filename"><span data-dz-name="true"></span></div>
+        <img data-dz-thumbnail="true" />
+      </div>
+      <div className="dz-progress"><span className="dz-upload" data-dz-uploadprogress="true"></span></div>
+      <div className="dz-success-mark"><span>✔</span></div>
+      <div className="dz-error-mark"><span>✘</span></div>
+      <div className="dz-error-message"><span data-dz-errormessage="true"></span></div>
+    </div>
+  )
+};
+var eventHandlers = { addedfile: (file) => console.log(file) };
 
-class AssetDetails extends Component {
+class AssetCreate extends Component {
   constructor(props) {
     super(props);
 
@@ -83,7 +95,7 @@ class AssetDetails extends Component {
 
   handleSave = () => {
     const { asset } = this.state;
-    const payload = { object_type: "asset", objects: [asset.id], data: asset };
+    const payload = { object_type: "asset", data: asset };
 
     // update asset request
     NebulaApi.setAssets(payload).then(
@@ -207,54 +219,6 @@ class AssetDetails extends Component {
                         </Row>
                       </div>
                     </TabPane>
-                    <TabPane tabId="2">
-                      <div className="animated fadeIn">
-                        <Row>
-                          <Col lg="12">
-                            <Card className="bg-secondary">
-                              <CardBody>
-                                <pre><strong>Path	: </strong>{asset.path}</pre>
-                                <pre><strong>Status	: </strong><i
-                                  className={`fa fa-circle text-${asset.status === 1 ? 'success' : 'danger'}`}/> {asset.status === 1 ? 'ONLINE' : 'OFFLINE'}</pre>
-                                <pre><strong>Folder	: </strong>{asset.id_folder}</pre>
-                                <pre><strong>Storage ID : </strong>{asset.id_storage} (production)</pre>
-                                <pre><strong>Media Type :	</strong>{MEDIA_TYPES[asset.media_type]}</pre>
-                                <pre><strong>Content Type :	</strong>{CONTENT_TYPES[asset.content_type]}</pre>
-                                <pre><strong>ID	: </strong>{asset.id}</pre>
-                                <pre><strong>Creation Time :	</strong>{moment.unix(asset.ctime).format('YYYY-MM-DD HH:mm')}</pre>
-                                <pre><strong>Modify Time :	</strong>{moment.unix(asset.mtime).format('YYYY-MM-DD HH:mm')}</pre>
-                              </CardBody>
-                            </Card>
-                          </Col>
-                        </Row>
-                      </div>
-                    </TabPane>
-                    <TabPane tabId="3">
-                      <div className="animated fadeIn">
-                        <Row>
-                          <Col lg="12">
-                            <Card className="bg-secondary">
-                              <CardBody>
-                                <pre><strong>Duration	: </strong>{moment.unix(asset.duration).utc().format('HH:mm:ss.SSS')}</pre>
-                                <pre><strong>File Modified	: </strong>{moment.unix(asset['file/mtime']).format('YYYY-MM-DD HH:mm')}</pre>
-                                <pre><strong>File Size	: </strong>{filesize(asset['file/size'] || 0)}</pre>
-                                <pre><strong>QC State	: </strong>4</pre>
-                                <pre><strong>Aspect Ratio	: </strong>{asset['video/aspect_ratio']}</pre>
-                                <pre><strong>Aspect Ratio	: </strong>{asset['video/aspect_ratio_f']}</pre>
-                                <pre><strong>Video Codec	: </strong>{asset['video/codec']}</pre>
-                                <pre><strong>Color Range	: </strong>{asset['video/color_range']}</pre>
-                                <pre><strong>Color Space	: </strong>{asset['video/color_spcace']}</pre>
-                                <pre><strong>FPS	: </strong>{asset['video/fps']}</pre>
-                                <pre><strong>FPS	: </strong>{asset['video/fps_f']}</pre>
-                                <pre><strong>Height	: </strong>{asset['video/height']}</pre>
-                                <pre><strong>Pixel Format	: </strong>{asset['video/pixel_format']}</pre>
-                                <pre><strong>Width	: </strong>{asset['video/width']}</pre>
-                              </CardBody>
-                            </Card>
-                          </Col>
-                        </Row>
-                      </div>
-                    </TabPane>
                   </TabContent>
                 </Col>
                 <Col xs="5" md="5" className="mb-4">
@@ -266,33 +230,10 @@ class AssetDetails extends Component {
                       </FormGroup>
                     </Col>
                     <Col xs="12" md="12" className="mb-4">
-                      <div style={{position: 'relative'}}>
-                        {asset.id
-                          ? (
-                            <Video
-                              autoPlay={false}
-                              controls={['PlayPause', 'Seek', 'Time', 'Volume', 'Fullscreen']}
-                              poster={`${KURRENTTV_BASE_URL}/thumb/0000/${asset.id}/orig.jpg`}
-                              onCanPlayThrough={() => {
-                                // Do stuff
-                              }}>
-                              <source src={`${KURRENTTV_BASE_URL}/proxy/0000/${asset.id}.mp4`} type="video/webm"/>
-                            </Video>
-                          )
-                          : null
-                        }
-
-                        {/*<i style={{ position:'absolute' ,top:'50%' ,left:'50%' ,fontSize:'100px' ,margin:'-50px 0 0 -40px'}} className="fa fa-play-circle"></i>*/}
-                        <div style={{textAlign: 'center', fontSize: '20px'}}>
-                          <i className="fa fa-flag text-success"/>
-                          <span>  </span>
-                          <i className="fa fa-flag text-secondary"/>
-                          <span>  </span>
-                          <i className="fa fa-flag text-danger"/>
-                          <span>  </span>
-                          <button className="badge badge-block btn-outline-secondary"
-                                  disabled>{moment.unix(asset.duration).utc().format('HH:mm:ss.SSS')}</button>
-                        </div>
+                      <div style={{position: 'relative', color: '#000'}}>
+                        <DropzoneComponent config={componentConfig}
+                                           eventHandlers={eventHandlers}
+                                           djsConfig={djsConfig} />
                       </div>
                     </Col>
                   </Row>
@@ -308,4 +249,4 @@ class AssetDetails extends Component {
   }
 }
 
-export default AssetDetails;
+export default AssetCreate;

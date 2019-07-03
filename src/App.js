@@ -6,6 +6,8 @@ import './App.scss';
 import 'react-bootstrap-table/dist/react-bootstrap-table.min.css';
 import CookiesHelper from './utils/CookiesHelper';
 import NebulaApi from './utils/api/NebulaApi';
+import RequireNoAuth from "./components/RequireNoAuth";
+import RequireAuth from "./components/RequireAuth";
 
 const loading = () => <div className="animated fadeIn pt-3 text-center"><div className="sk-spinner sk-spinner-pulse"></div></div>;
 
@@ -38,7 +40,7 @@ const Page500 = Loadable({
 
 class App extends Component {
   componentDidMount() {
-    this.authenticate()
+    // this.authenticate()
   }
 
   authenticate = () => {
@@ -53,16 +55,16 @@ class App extends Component {
     return (
       <HashRouter>
         <Switch>
-          <Route exact path="/login" name="Login Page" component={Login} />
+          <Route exact path="/login" name="Login Page" component={RequireNoAuth(Login)} />
           <Route
             exact
             path="/register"
             name="Register Page"
-            component={Register}
+            component={RequireNoAuth(Register)}
           />
-          <Route exact path="/404" name="Page 404" component={Page404} />
-          <Route exact path="/500" name="Page 500" component={Page500} />
-          <Route path="/" name="Home" component={DefaultLayout} />
+          <Route exact path="/404" name="Page 404" component={RequireNoAuth(Page404)} />
+          <Route exact path="/500" name="Page 500" component={RequireNoAuth(Page500)} />
+          <Route path="/" name="Home" component={RequireAuth(DefaultLayout)} />
         </Switch>
       </HashRouter>
     );
