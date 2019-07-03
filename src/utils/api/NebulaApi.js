@@ -1,7 +1,4 @@
-import {
-  API_USERNAME, API_PASSWORD, API_VERSION, LOGIN_URL, ASSETS_URL, JOBS_URL, SET_ASSETS_URL,
-  SETTINGS_URL
-} from "../Constants";
+import { API_VERSION, LOGIN_URL, ASSETS_URL, JOBS_URL, SET_ASSETS_URL, SETTINGS_URL } from "../Constants";
 import axios from "axios";
 
 export default class NebulaApi {
