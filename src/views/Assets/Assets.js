@@ -1,14 +1,20 @@
 import React, { Component } from 'react';
+import { filter, map } from 'lodash';
 import { Badge, Button, ButtonGroup, ButtonToolbar, Col, Collapse, FormGroup, Input, InputGroup, InputGroupAddon, Nav, NavItem, NavLink, Row, TabContent, TabPane } from 'reactstrap';
 import classnames from 'classnames';
+import cookie from 'react-cookies';
 import {Card, CardHeader, CardBody} from 'reactstrap';
 import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
+import { DefaultPlayer as Video } from 'react-html5video';
+import 'react-html5video/dist/styles.css';
 import data from './_data';
 // React select
 import displayoptions from './display-options';
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 import NebulaApi from '../../utils/api/NebulaApi';
+import {Link} from "react-router-dom";
+import {KURRENTTV_BASE_URL} from "../../utils/Constants";
 
 const options = displayoptions.DOPTIONS;
 
@@ -24,7 +30,9 @@ class Assets extends Component {
       items: [],
       isLoaded: false,
       tableItems: false,
-      layout: 'List'
+      layout: 'List',
+      search: '',
+      selectedOption: [],
     };
 
     this.MainTable = data.rows;
@@ -38,21 +46,26 @@ class Assets extends Component {
       withFirstAndLast: false,
     };
   }
-	
-  subTitleFormat(cell){  
-  	if(cell === "" || cell == 'undefined' || cell == null) 
+
+  subTitleFormat(cell){
+  	if(cell === "" || cell == 'undefined' || cell == null)
   	return "-";
   	else return cell;
-  		
+
   }
-  assetStatusFlag(cell){  
-  	if(cell === 1) 
+  titleFormat(cell, row){
+  	if(cell === "" || cell == 'undefined' || cell == null)
+  	return "-";
+    else return <Link to={`/asset/${row.id}`}>{cell}</Link>;
+  }
+  assetStatusFlag(cell){
+  	if(cell === 1)
   	return <i className='fa fa-circle text-success' />
   	else return <i className='fa fa-circle text-disabled' />
-  		
+
   }
-  folderName(cell){  
-  
+  folderName(cell){
+
   	let folder = '';
   	 if(cell != '')
   	 {
@@ -98,7 +111,7 @@ class Assets extends Component {
 	 }
 	 return folder;
   }
-  secondsToHms(d){  	
+  secondsToHms(d){
   	if(d !== "" && d !== undefined)
   	{
 	   const fps = 25;
@@ -107,29 +120,33 @@ class Assets extends Component {
 	         m = pad2( d % 3600 / 60 ),
 	         s = pad2( d % 60 ),
 	         f = pad2( d % 1 * fps ); // +1 here for one based frame
-	   return `${h}:${m}:${s}:${f}`;	
+	   return `${h}:${m}:${s}:${f}`;
 	}
-	else 
+	else
 		return '00:00:00.00';
-  	
+
 	}
   formatTime(cell){
-  	var date = new Date(cell*1000);  
+  	var date = new Date(cell*1000);
   	var d = date.getDay();
   	var m = date.getMonth();
   	var y = date.getFullYear();
-	var hours = date.getHours();
-	var minutes = "0" + date.getMinutes();
-	var seconds = "0" + date.getSeconds();
-	var formattedTime = y + '-' + m + '-' + d + ' ' + hours + ':' + minutes.substr(-2);
-	return formattedTime;
+    var hours = date.getHours();
+    var minutes = "0" + date.getMinutes();
+    var seconds = "0" + date.getSeconds();
+    var formattedTime = y + '-' + m + '-' + d + ' ' + hours + ':' + minutes.substr(-2);
+    return formattedTime;
+  }
+  componentWillMount() {
+    const optionsCookie = cookie.load('assetOptions') || [];
+    this.setState({ selectedOptions: optionsCookie });
   }
   componentDidMount() {
-    const data = { object_type: 'asset', id_view:1};  
-      NebulaApi.getAssets(data).then(res => {   
-         	
+    const data = { object_type: 'asset', id_view:1};
+      NebulaApi.getAssets(data).then(res => {
+
         var arr = [];
-		arr.push(res.data.data); 
+		    arr.push(res.data.data);
         this.setState({
           items: arr,
           isLoaded: true
@@ -137,15 +154,14 @@ class Assets extends Component {
        ).catch( err => {
         console.error(err)
       })
-  }  
-  showLayout = (_layout) => { 
-   	
+  }
+  showLayout = (_layout) => {
   	this.setState({
         layout: _layout
       });
   }
-  
-  showOptions = (_showHide) => {   
+
+  showOptions = (_showHide) => {
   	this.setState({
         tableItems: !this.state.tableItems
       });
@@ -158,12 +174,12 @@ class Assets extends Component {
 	else
 	{
 		return "";
-	}  	
+	}
   }
   fpsFormat(cell){
   	if(cell != "" && cell != null &&  typeof cell !== undefined)
   	{
-		var fps = cell.split("/");	
+		var fps = cell.split("/");
 		return fps[0];
 	}
 	else
@@ -177,7 +193,7 @@ class Assets extends Component {
 	   var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
 	   return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i];
   }
-  toggle = (tab) => {  
+  toggle = (tab) => {
     if (this.state.activeTab !== tab) {
       this.setState({
         activeTab: tab,
@@ -219,7 +235,7 @@ class Assets extends Component {
       NebulaApi.getAssets(data).then(
         response => {
         	var arr = [];
-		arr.push(response.data.data); 
+          arr.push(response.data.data);
           this.setState({
             items: arr,
             isLoaded: true
@@ -230,112 +246,144 @@ class Assets extends Component {
         }
       );
     }
-      
+
+  }
+  changeSearch = (event) => {
+    this.setState({search: event.target.value})
+  }
+  applySearch = () => {
+    this.setState({finalSearch: this.state.search})
+  }
+  resetSearch = () => {
+    this.setState({search: '', finalSearch: ''})
+  }
+  saveChanges = (selectedOptions) => {
+    cookie.save('assetOptions', selectedOptions);
+    this.setState({ selectedOptions });
   }
 
   render() {
   	var foldetStyle = {
-		padding:'5px',
-		color: 'eee'
-	}
-  	var {activeTab,items,isLoaded,tableItems,layout} = this.state;  	
-  	let formItems;let _tableData;
-  	if(tableItems===true){
-  		
-  		formItems = (
-  			 <FormGroup>
-                <Select
-                  name="form-field-name2"
-                  value={this.state.value}
-                  options={options}
-                  onChange={this.saveChanges}
-                  multi
-                />
-              </FormGroup>
-  		);
-	}	
-	if(isLoaded === true)
-	{
-		 var style = { 
-	        width:'100%'
-	    };
-	    var stImg = {
-			position:'absolute',
-			top:'50%',
-			left:'50%',
-			fontSize:'50px',
-			margin:'-25px 0px 0px -20px'
-		}
-		if(layout == 'List')
-		{
-			_tableData = (
-			<BootstrapTable data={items[0]} version="4" style={{border:'1px solid #23282c'}} striped hover pagination options={this.options} className="assetTable">
-	            <TableHeaderColumn isKey dataField="title">Title</TableHeaderColumn>
-	             <TableHeaderColumn dataField="subtitle" dataFormat={ this.subTitleFormat }>Sub Title</TableHeaderColumn>
-	            <TableHeaderColumn dataField="idec" dataFormat={ this.subTitleFormat }>IDEC</TableHeaderColumn>
-	            <TableHeaderColumn dataField="id_folder" dataFormat={this.folderName}>Folder</TableHeaderColumn>
-	            <TableHeaderColumn dataField="gener" dataFormat={ this.subTitleFormat }>Genre</TableHeaderColumn>
-	            <TableHeaderColumn dataField="duration"  dataFormat={this.secondsToHms}>Duration</TableHeaderColumn>
-	            <TableHeaderColumn dataField="ctime" dataFormat={ this.formatTime }>Created</TableHeaderColumn>
-	            <TableHeaderColumn dataField="mtime" dataFormat={ this.formatTime }>Modified</TableHeaderColumn>
-	          </BootstrapTable>
-			);
-		}
-		else if(layout == 'Grid')
-		{
-			if(items[0].length > 0)
-			{
-				_tableData = (			
-			<div className="row" style={{border:'1px solid #23282c',paddingTop:'18px'}}>		        
-	        	  {items[0].map(item =>(
-	        	  
-	        	  		<Col key={item['id']} xl="2" md="4" sm="6" xs="12" className="mb-4">
-	        	  			<table className="w-100" style={{tableLayout:'fixed'}}>
-						        <tbody>
-						        <tr key={item['id']}>
-						        <div style={{ position:'relative' }}>
-						        <img style={{ width: '100%'}} src={'/assets/img/hqdefault.jpg'} alt="boohoo" className="img-responsive"/>
-						         <i style={{ position:'absolute' ,top:'50%' ,left:'50%' ,fontSize:'50px' ,margin:'-25px 0 0 -20px'}} className="fa fa-play-circle"></i>
-						         </div>
-						        <h5>{this.subTitleFormat(item['title'])}</h5>
-						          {this.assetStatusFlag(item['status'])}
-						          <span>  </span>
-						          <i className="fa fa-flag text-danger" />
-						          <span>  </span>
-						          {this.folderName(item['id_folder'])}						         
-						          <span>  </span>
-						          <button className="badge badge-block btn-outline-secondary" disabled>{this.secondsToHms(item['duration'])}</button>
-						          <span>  </span>
-						          <button className="badge badge-block btn-outline-secondary" disabled>{this.bytesToSize(item['file/size'])}</button>
-						          <span>  </span>
-						          <button className="badge badge-block btn-outline-secondary" disabled>{this.fpsFormat(item['video/fps'])}FPS</button>
-						          <span>  </span>
-						          <button className="badge badge-block btn-outline-secondary" disabled>{this.videoCodec(item['video/codec'])}</button>
-						          <span>  </span>
-						          <button className="badge badge-block btn-outline-secondary" disabled>{item['video/width']}x{item['video/height']}</button>
-						        </tr>
-						        </tbody>
-						      </table>
-	        	  		
-	        	  		</Col>
-	        	  		                          
-                    ))}
-		    </div>		
-		
-			);	
-			}
-			else
-			{
-				_tableData = (<div className="row" style={{paddingLeft:'17px'}}>No Record Found!</div>);
-			}
-		}		
-	}
-	else
-	{
-		_tableData = ( <div> Loading....</div>);
-	}
-	
-	
+      padding:'5px',
+      color: 'eee'
+    }
+    var {activeTab,items,isLoaded,tableItems,layout,search,finalSearch,selectedOptions} = this.state;
+    let formItems;let _tableData;
+    if(tableItems===true){
+
+      formItems = (
+        <FormGroup>
+          <Select
+            name="form-field-name2"
+            value={selectedOptions}
+            options={options}
+            onChange={this.saveChanges}
+            multi
+          />
+        </FormGroup>
+      );
+    }
+    if(isLoaded === true)
+    {
+      var style = {
+        width:'100%'
+      };
+      var stImg = {
+        position:'absolute',
+        top:'50%',
+        left:'50%',
+        fontSize:'50px',
+        margin:'-25px 0px 0px -20px'
+      }
+      let finalItems = items[0]
+
+      if (finalSearch) {
+        finalItems = filter(items[0], obj => obj.title.indexOf(finalSearch) > -1);
+      }
+
+      if(layout == 'List')
+      {
+        _tableData = (
+        <BootstrapTable data={finalItems} version="4" style={{border:'1px solid #23282c'}} striped hover pagination options={this.options} className="assetTable">
+                <TableHeaderColumn isKey dataField="title" dataFormat={ this.titleFormat }>Title</TableHeaderColumn>
+                 <TableHeaderColumn dataField="subtitle" dataFormat={ this.subTitleFormat }>Sub Title</TableHeaderColumn>
+                <TableHeaderColumn dataField="idec" dataFormat={ this.subTitleFormat }>IDEC</TableHeaderColumn>
+                <TableHeaderColumn dataField="id_folder" dataFormat={this.folderName}>Folder</TableHeaderColumn>
+                <TableHeaderColumn dataField="gener" dataFormat={ this.subTitleFormat }>Genre</TableHeaderColumn>
+                <TableHeaderColumn dataField="duration"  dataFormat={this.secondsToHms}>Duration</TableHeaderColumn>
+                <TableHeaderColumn dataField="ctime" dataFormat={ this.formatTime }>Created</TableHeaderColumn>
+                <TableHeaderColumn dataField="mtime" dataFormat={ this.formatTime }>Modified</TableHeaderColumn>
+                {map(selectedOptions, (item, index) => (<TableHeaderColumn key={index} dataField={item.value} dataFormat={ this.subTitleFormat }>{item.label}</TableHeaderColumn>))
+                }
+              </BootstrapTable>
+        );
+      }
+      else if(layout == 'Grid')
+      {
+        if(finalItems.length > 0)
+        {
+          _tableData = (
+            <div className="card">
+              <div className="card-body">
+                <div className="row">
+                {finalItems.map(item =>(
+
+                    <Col key={item['id']} xl="2" md="4" sm="6" xs="12" className="mb-4">
+                      <table className="w-100" style={{tableLayout:'fixed'}}>
+                        <tbody>
+                          <tr key={item['id']}>
+                            <td>
+                              <div style={{ position:'relative' }}>
+                                <Video
+                                  autoPlay={false}
+                                  controls={['PlayPause', 'Seek', 'Time', 'Volume', 'Fullscreen']}
+                                  poster={`${KURRENTTV_BASE_URL}/thumb/0000/${item['id']}/orig.jpg`}
+                                  onCanPlayThrough={() => {
+                                    // Do stuff
+                                  }}>
+                                  <source src={`${KURRENTTV_BASE_URL}/proxy/0000/${item['id']}.mp4`} type="video/webm"/>
+                                </Video>
+                               {/*<i style={{ position:'absolute' ,top:'50%' ,left:'50%' ,fontSize:'50px' ,margin:'-25px 0 0 -20px'}} className="fa fa-play-circle"></i>*/}
+                              </div>
+                              <Link to={`/asset/${item['id']}`}><h5>{this.subTitleFormat(item['title'])}</h5></Link>
+                                {this.assetStatusFlag(item['status'])}
+                                <span>  </span>
+                                <i className="fa fa-flag text-danger" />
+                                <span>  </span>
+                                {this.folderName(item['id_folder'])}
+                                <span>  </span>
+                                <button className="badge badge-block btn-outline-secondary" disabled>{this.secondsToHms(item['duration'])}</button>
+                                <span>  </span>
+                                <button className="badge badge-block btn-outline-secondary" disabled>{this.bytesToSize(item['file/size'])}</button>
+                                <span>  </span>
+                                <button className="badge badge-block btn-outline-secondary" disabled>{this.fpsFormat(item['video/fps'])}FPS</button>
+                                <span>  </span>
+                                <button className="badge badge-block btn-outline-secondary" disabled>{this.videoCodec(item['video/codec'])}</button>
+                                <span>  </span>
+                                <button className="badge badge-block btn-outline-secondary" disabled>{item['video/width']}x{item['video/height']}</button>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </Col>
+
+                      ))}
+            </div>
+            </div>
+            </div>
+
+        );
+        }
+        else
+        {
+          _tableData = (<div className="row" style={{paddingLeft:'17px'}}>No Record Found!</div>);
+        }
+      }
+    }
+    else
+    {
+      _tableData = ( <div> Loading....</div>);
+    }
 
     return (
       <div className="animated fadeIn">
@@ -415,8 +463,8 @@ class Assets extends Component {
               <Col sm="4" className="d-none d-sm-inline-block">
                 <ButtonToolbar className="float-left" aria-label="Toolbar with button groups">
                   <ButtonGroup className="mr-3" aria-label="First group">
-                    <Button onClick={() => { this.showLayout('List'); }} color="outline-secondary"><i className="fa fa-th-list"></i></Button>
-                    <Button onClick={() => { this.showLayout('Grid'); }} color="outline-secondary"><i className="fa fa-th-large"></i></Button>
+                    <Button onClick={() => { this.showLayout('List'); }} active={layout === 'List'} color="outline-secondary"><i className="fa fa-th-list"></i></Button>
+                    <Button onClick={() => { this.showLayout('Grid'); }} active={layout === 'Grid'} color="outline-secondary"><i className="fa fa-th-large"></i></Button>
                     <Button onClick={() => { this.showOptions(true); }} color="outline-secondary"><i className="fa fa-gear"></i></Button>
                   </ButtonGroup>
                 </ButtonToolbar>
@@ -428,11 +476,11 @@ class Assets extends Component {
               <FormGroup className="float-right">
                 <InputGroup>
                   <InputGroupAddon addonType="prepend">
-                    <Button type="button" color="btn btn-outline-dark btn-block"><i className="fa fa-search"></i></Button>
+                    <Button type="button" color="btn btn-outline-dark btn-block" onClick={this.applySearch}><i className="fa fa-search"></i></Button>
                   </InputGroupAddon>
-                  <Input type="text" id="input3-group2" name="input3-group2" placeholder="Search" />
+                  <Input type="text" id="input3-group2" name="input3-group2" placeholder="Search" value={search} onChange={this.changeSearch} />
                   <InputGroupAddon addonType="append">
-                    <Button type="button" color="btn btn-outline-dark btn-block"><i className="fa fa-times"></i></Button>
+                    <Button type="button" color="btn btn-outline-dark btn-block" onClick={this.resetSearch}><i className="fa fa-times"></i></Button>
                   </InputGroupAddon>
                 </InputGroup>
               </FormGroup>
@@ -448,8 +496,8 @@ class Assets extends Component {
               <Col sm="4" className="d-none d-sm-inline-block">
                 <ButtonToolbar className="float-left" aria-label="Toolbar with button groups">
                   <ButtonGroup className="mr-3" aria-label="First group">
-                     <Button onClick={() => { this.showLayout('List'); }} color="outline-secondary"><i className="fa fa-th-list"></i></Button>
-                    <Button onClick={() => { this.showLayout('Grid'); }} color="outline-secondary"><i className="fa fa-th-large"></i></Button>
+                     <Button onClick={() => { this.showLayout('List'); }} active={layout === 'List'} color="outline-secondary"><i className="fa fa-th-list"></i></Button>
+                    <Button onClick={() => { this.showLayout('Grid'); }} active={layout === 'Grid'} color="outline-secondary"><i className="fa fa-th-large"></i></Button>
                     <Button onClick={() => { this.showOptions(true); }} color="outline-secondary"><i className="fa fa-gear"></i></Button>
                   </ButtonGroup>
                 </ButtonToolbar>
@@ -481,8 +529,8 @@ class Assets extends Component {
               <Col sm="4" className="d-none d-sm-inline-block">
                 <ButtonToolbar className="float-left" aria-label="Toolbar with button groups">
                   <ButtonGroup className="mr-3" aria-label="First group">
-                     <Button onClick={() => { this.showLayout('List'); }} color="outline-secondary"><i className="fa fa-th-list"></i></Button>
-                    <Button onClick={() => { this.showLayout('Grid'); }} color="outline-secondary"><i className="fa fa-th-large"></i></Button>
+                     <Button onClick={() => { this.showLayout('List'); }} active={layout === 'List'} color="outline-secondary"><i className="fa fa-th-list"></i></Button>
+                    <Button onClick={() => { this.showLayout('Grid'); }} active={layout === 'Grid'} color="outline-secondary"><i className="fa fa-th-large"></i></Button>
                     <Button onClick={() => { this.showOptions(true); }} color="outline-secondary"><i className="fa fa-gear"></i></Button>
                   </ButtonGroup>
                 </ButtonToolbar>
@@ -514,8 +562,8 @@ class Assets extends Component {
               <Col sm="4" className="d-none d-sm-inline-block">
                 <ButtonToolbar className="float-left" aria-label="Toolbar with button groups">
                   <ButtonGroup className="mr-3" aria-label="First group">
-                     <Button onClick={() => { this.showLayout('List'); }} color="outline-secondary"><i className="fa fa-th-list"></i></Button>
-                    <Button onClick={() => { this.showLayout('Grid'); }} color="outline-secondary"><i className="fa fa-th-large"></i></Button>
+                     <Button onClick={() => { this.showLayout('List'); }} active={layout === 'List'} color="outline-secondary"><i className="fa fa-th-list"></i></Button>
+                    <Button onClick={() => { this.showLayout('Grid'); }} active={layout === 'Grid'} color="outline-secondary"><i className="fa fa-th-large"></i></Button>
                     <Button onClick={() => { this.showOptions(true); }} color="outline-secondary"><i className="fa fa-gear"></i></Button>
                   </ButtonGroup>
                 </ButtonToolbar>
@@ -547,8 +595,8 @@ class Assets extends Component {
               <Col sm="4" className="d-none d-sm-inline-block">
                 <ButtonToolbar className="float-left" aria-label="Toolbar with button groups">
                   <ButtonGroup className="mr-3" aria-label="First group">
-                     <Button onClick={() => { this.showLayout('List'); }} color="outline-secondary"><i className="fa fa-th-list"></i></Button>
-                    <Button onClick={() => { this.showLayout('Grid'); }} color="outline-secondary"><i className="fa fa-th-large"></i></Button>
+                     <Button onClick={() => { this.showLayout('List'); }} active={layout === 'List'} color="outline-secondary"><i className="fa fa-th-list"></i></Button>
+                    <Button onClick={() => { this.showLayout('Grid'); }} active={layout === 'Grid'} color="outline-secondary"><i className="fa fa-th-large"></i></Button>
                     <Button onClick={() => { this.showOptions(true); }} color="outline-secondary"><i className="fa fa-gear"></i></Button>
                   </ButtonGroup>
                 </ButtonToolbar>
@@ -580,8 +628,8 @@ class Assets extends Component {
               <Col sm="4" className="d-none d-sm-inline-block">
                 <ButtonToolbar className="float-left" aria-label="Toolbar with button groups">
                   <ButtonGroup className="mr-3" aria-label="First group">
-                     <Button onClick={() => { this.showLayout('List'); }} color="outline-secondary"><i className="fa fa-th-list"></i></Button>
-                    <Button onClick={() => { this.showLayout('Grid'); }} color="outline-secondary"><i className="fa fa-th-large"></i></Button>
+                     <Button onClick={() => { this.showLayout('List'); }} active={layout === 'List'} color="outline-secondary"><i className="fa fa-th-list"></i></Button>
+                    <Button onClick={() => { this.showLayout('Grid'); }} active={layout === 'Grid'} color="outline-secondary"><i className="fa fa-th-large"></i></Button>
                     <Button onClick={() => { this.showOptions(true); }} color="outline-secondary"><i className="fa fa-gear"></i></Button>
                   </ButtonGroup>
                 </ButtonToolbar>
@@ -613,8 +661,8 @@ class Assets extends Component {
               <Col sm="4" className="d-none d-sm-inline-block">
                 <ButtonToolbar className="float-left" aria-label="Toolbar with button groups">
                   <ButtonGroup className="mr-3" aria-label="First group">
-                    <Button onClick={() => { this.showLayout('List'); }} color="outline-secondary"><i className="fa fa-th-list"></i></Button>
-                    <Button onClick={() => { this.showLayout('Grid'); }} color="outline-secondary"><i className="fa fa-th-large"></i></Button>
+                    <Button onClick={() => { this.showLayout('List'); }} active={layout === 'List'} color="outline-secondary"><i className="fa fa-th-list"></i></Button>
+                    <Button onClick={() => { this.showLayout('Grid'); }} active={layout === 'Grid'} color="outline-secondary"><i className="fa fa-th-large"></i></Button>
                     <Button onClick={() => { this.showOptions(true); }} color="outline-secondary"><i className="fa fa-gear"></i></Button>
                   </ButtonGroup>
                 </ButtonToolbar>
@@ -646,8 +694,8 @@ class Assets extends Component {
               <Col sm="4" className="d-none d-sm-inline-block">
                 <ButtonToolbar className="float-left" aria-label="Toolbar with button groups">
                   <ButtonGroup className="mr-3" aria-label="First group">
-                     <Button onClick={() => { this.showLayout('List'); }} color="outline-secondary"><i className="fa fa-th-list"></i></Button>
-                    <Button onClick={() => { this.showLayout('Grid'); }} color="outline-secondary"><i className="fa fa-th-large"></i></Button>
+                     <Button onClick={() => { this.showLayout('List'); }} active={layout === 'List'} color="outline-secondary"><i className="fa fa-th-list"></i></Button>
+                    <Button onClick={() => { this.showLayout('Grid'); }} active={layout === 'Grid'} color="outline-secondary"><i className="fa fa-th-large"></i></Button>
                     <Button onClick={() => { this.showOptions(true); }} color="outline-secondary"><i className="fa fa-gear"></i></Button>
                   </ButtonGroup>
                 </ButtonToolbar>

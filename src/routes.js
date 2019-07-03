@@ -46,6 +46,7 @@ const Buttons = React.lazy(() => import('./views/Buttons/Buttons'));
 const Charts = React.lazy(() => import('./views/Charts'));
 const Dashboard = React.lazy(() => import('./views/Dashboard'));
 const Assets = React.lazy(() => import('./views/Assets'));
+const AssetsDetails = React.lazy(() => import('./views/AssetsDetails'));
 const Copy = React.lazy(() => import('./views/Copy'));
 const CoreUIIcons = React.lazy(() => import('./views/Icons/CoreUIIcons'));
 const Flags = React.lazy(() => import('./views/Icons/Flags'));
@@ -65,6 +66,7 @@ const routes = [
   { path: '/', name: 'Home', component: DefaultLayout, exact: true },
   { path: '/dashboard', name: 'Dashboard', component: Dashboard },
   { path: '/assets', name: 'Assets', component: Assets },
+  { path: '/asset/:id', name: 'Assets Details', component: AssetsDetails },
   { path: '/copy', name: 'Assets Copy', component: Copy },
   { path: '/theme', name: 'Theme', component: Colors, exact: true },
   { path: '/theme/colors', name: 'Colors', component: Colors },
