@@ -23,11 +23,6 @@ export default {
       icon: 'fa fa-database',
     },
     {
-      name: 'Copy',
-      url: '/copy',
-      icon: 'fa fa-database',
-    },
-    {
       name: 'Jobs',
       url: '/buttons',
       icon: 'fa fa-tasks',
