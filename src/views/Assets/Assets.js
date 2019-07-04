@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { filter, map, isEmpty, findIndex, forEach } from 'lodash';
 import { Badge, Button, ButtonGroup, ButtonToolbar, Col, Collapse, FormGroup, Input, InputGroup, InputGroupAddon, Nav, NavItem, NavLink, Row, TabContent, TabPane } from 'reactstrap';
 import classnames from 'classnames';
-import cookie from 'react-cookies';
 import {Card, CardHeader, CardBody} from 'reactstrap';
 import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
 import { DefaultPlayer as Video } from 'react-html5video';
@@ -47,17 +46,12 @@ class Assets extends Component {
       withFirstAndLast: false,
     };
   }
-
-  subTitleFormat(cell){
-  	if(cell === "" || cell == 'undefined' || cell == null)
+	
+  subTitleFormat(cell){  
+  	if(cell === "" || cell == 'undefined' || cell == null) 
   	return "-";
   	else return cell;
-
-  }
-  titleFormat(cell, row){
-  	if(cell === "" || cell == 'undefined' || cell == null)
-  	return "-";
-    else return <Link to={`/asset/${row.id}`}>{cell}</Link>;
+  		
   }
   titleFormat(cell, row){
   	if(cell === "" || cell == 'undefined' || cell == null)
@@ -68,7 +62,7 @@ class Assets extends Component {
   	if(cell === 1) 
   	return <i className='fa fa-circle text-success' />
   	else return <i className='fa fa-circle text-disabled' />
-
+  		
   }
   folderName = (assetFolders) => (cell) => {
   
@@ -87,7 +81,7 @@ class Assets extends Component {
   }
 	 return folder;
   }
-  secondsToHms(d){
+  secondsToHms(d){  	
   	if(d !== "" && d !== undefined)
   	{
 	   const fps = 25;
@@ -96,14 +90,14 @@ class Assets extends Component {
 	         m = pad2( d % 3600 / 60 ),
 	         s = pad2( d % 60 ),
 	         f = pad2( d % 1 * fps ); // +1 here for one based frame
-	   return `${h}:${m}:${s}:${f}`;
+	   return `${h}:${m}:${s}:${f}`;	
 	}
-	else
+	else 
 		return '00:00:00.00';
-
+  	
 	}
   formatTime(cell){
-  	var date = new Date(cell*1000);
+  	var date = new Date(cell*1000);  
   	var d = date.getDay();
   	var m = date.getMonth();
   	var y = date.getFullYear();
@@ -155,8 +149,8 @@ class Assets extends Component {
         layout: _layout
       });
   }
-
-  showOptions = (_showHide) => {
+  
+  showOptions = (_showHide) => {   
   	this.setState({
         tableItems: !this.state.tableItems
       });
@@ -169,12 +163,12 @@ class Assets extends Component {
 	else
 	{
 		return "";
-	}
+	}  	
   }
   fpsFormat(cell){
   	if(cell != "" && cell != null &&  typeof cell !== undefined)
   	{
-		var fps = cell.split("/");
+		var fps = cell.split("/");	
 		return fps[0];
 	}
 	else
@@ -188,7 +182,7 @@ class Assets extends Component {
 	   var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
 	   return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i];
   }
-  toggle = (tab) => {
+  toggle = (tab) => {  
     if (this.state.activeTab !== tab) {
       this.setState({
         activeTab: tab,
@@ -219,20 +213,7 @@ class Assets extends Component {
         }
       );
     }
-
-  }
-  changeSearch = (event) => {
-    this.setState({search: event.target.value})
-  }
-  applySearch = () => {
-    this.setState({finalSearch: this.state.search})
-  }
-  resetSearch = () => {
-    this.setState({search: '', finalSearch: ''})
-  }
-  saveChanges = (selectedOptions) => {
-    cookie.save('assetOptions', selectedOptions);
-    this.setState({ selectedOptions });
+      
   }
   changeSearch = (event) => {
     this.setState({search: event.target.value})
