@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { filter, map, isEmpty, findIndex, forEach } from 'lodash';
+import { filter, map, isEmpty, find, forEach } from 'lodash';
 import { Badge, Button, ButtonGroup, ButtonToolbar, Col, Collapse, FormGroup, Input, InputGroup, InputGroupAddon, Nav, NavItem, NavLink, Row, TabContent, TabPane } from 'reactstrap';
 import classnames from 'classnames';
 import {Card, CardHeader, CardBody} from 'reactstrap';
@@ -111,6 +111,7 @@ class Assets extends Component {
     const optionsCookie = CookiesHelper.getCookie('assetOptions') || [];
     const assetViews = localStorage.getItem('assetViews') ? JSON.parse(localStorage.getItem('assetViews')) || {} : {};
     const assetFolders = localStorage.getItem('assetFolders') ? JSON.parse(localStorage.getItem('assetFolders')) || {} : {};
+    const metaTypes = localStorage.getItem('metaTypes') ? JSON.parse(localStorage.getItem('metaTypes')) || {} : {};
     this.setState({ selectedOptions: optionsCookie });
     let data = { object_type: 'asset', id_view:1};
     NebulaApi.getAssets(data).then(res => {
@@ -126,21 +127,23 @@ class Assets extends Component {
     })
     data = { user: 'demo'};
 
-    if (isEmpty(assetViews) || isEmpty(assetFolders)) {
+    if (isEmpty(assetViews) || isEmpty(assetFolders) || isEmpty(metaTypes)) {
       NebulaApi.getSettings(data).then(res => {
           let assetViews = res.data && res.data.data && res.data.data.views || [];
           let assetFolders = res.data && res.data.data && res.data.data.folders || [];
+          let metaTypes = res.data && res.data.data && res.data.data.meta_types || [];
           this.setState({
-            assetViews, assetFolders
+            assetViews, assetFolders, metaTypes
           })
           localStorage.setItem('assetViews', JSON.stringify(assetViews));
           localStorage.setItem('assetFolders', JSON.stringify(assetFolders));
+          localStorage.setItem('metaTypes', JSON.stringify(metaTypes));
         }
       ).catch( err => {
         console.error(err)
       })
     } else {
-      this.setState({assetViews, assetFolders});
+      this.setState({assetViews, assetFolders, metaTypes});
     }
 
   }  
@@ -193,7 +196,6 @@ class Assets extends Component {
       let viewType = 1;
 
       forEach(this.state.assetViews, (view, index) => {
-        console.log('view', view, tab, view.title === tab);
         if (view.title === tab) {
           viewType = parseInt(index);
         }
@@ -235,8 +237,12 @@ class Assets extends Component {
       padding:'5px',
       color: 'eee'
     }
-    var {activeTab,items,isLoaded,tableItems,layout,search,finalSearch,selectedOptions, assetFolders, assetViews} = this.state;
-    let formItems;let _tableData;
+    var {activeTab,items,isLoaded,tableItems,layout,search,finalSearch,selectedOptions, assetFolders, assetViews,metaTypes } = this.state;
+    let formItems;
+    let _tableData;
+    const currentView = find(assetViews, view => view.title === activeTab)
+    const columns = currentView && currentView.columns || []
+
     if(tableItems===true){
 
       formItems = (
@@ -273,17 +279,49 @@ class Assets extends Component {
       {
         _tableData = (
         <BootstrapTable data={finalItems} version="4" style={{border:'1px solid #23282c'}} striped hover pagination options={this.options} className="assetTable">
-                <TableHeaderColumn isKey dataField="title" dataFormat={ this.titleFormat }>Title</TableHeaderColumn>
-                 <TableHeaderColumn dataField="subtitle" dataFormat={ this.subTitleFormat }>Sub Title</TableHeaderColumn>
-                <TableHeaderColumn dataField="idec" dataFormat={ this.subTitleFormat }>IDEC</TableHeaderColumn>
-                <TableHeaderColumn dataField="id_folder" dataFormat={this.folderName(assetFolders)}>Folder</TableHeaderColumn>
-                <TableHeaderColumn dataField="gener" dataFormat={ this.subTitleFormat }>Genre</TableHeaderColumn>
-                <TableHeaderColumn dataField="duration"  dataFormat={this.secondsToHms}>Duration</TableHeaderColumn>
-                <TableHeaderColumn dataField="ctime" dataFormat={ this.formatTime }>Created</TableHeaderColumn>
-                <TableHeaderColumn dataField="mtime" dataFormat={ this.formatTime }>Modified</TableHeaderColumn>
-                {map(selectedOptions, (item, index) => (<TableHeaderColumn key={index} dataField={item.field} dataFormat={ this.subTitleFormat }>{item.label}</TableHeaderColumn>))
-                }
-              </BootstrapTable>
+          {map(columns, (column, index) => {
+            const title = metaTypes && metaTypes[column] && metaTypes[column].aliases && metaTypes[column].aliases.en && metaTypes[column].aliases.en[0] || ''
+            const dataType = metaTypes && metaTypes[column] && metaTypes[column].class || 0
+            let dataFormat = this.titleFormat;
+            switch (dataType) {
+              case 0: dataFormat = this.subTitleFormat
+                break;
+              case 1: dataFormat = this.subTitleFormat
+                break;
+              case 2: dataFormat = this.subTitleFormat
+                break;
+              case 3: dataFormat = this.subTitleFormat
+                break;
+              case 4: dataFormat = this.subTitleFormat
+                break;
+              case 5: dataFormat = this.formatTime
+                break;
+              case 6: dataFormat = this.secondsToHms
+                break;
+              case 7: dataFormat = this.subTitleFormat
+                break;
+              case 8: dataFormat = this.subTitleFormat
+                break;
+              case 9: dataFormat = this.subTitleFormat
+                break;
+              case 10: dataFormat = this.subTitleFormat
+                break;
+              case 11: dataFormat = this.subTitleFormat
+                break;
+            }
+            if (column === 'title') {
+              dataFormat = this.titleFormat
+            }
+            if (column === 'id_folder') {
+              dataFormat = this.folderName(assetFolders)
+            }
+            return (<TableHeaderColumn key={index} isKey={column === 'title'} dataField={column}
+                               dataFormat={dataFormat}>{title}</TableHeaderColumn>)
+          })
+          }
+          {map(selectedOptions, (item, index) => (<TableHeaderColumn key={index} dataField={item.field} dataFormat={ this.subTitleFormat }>{item.label}</TableHeaderColumn>))
+          }
+        </BootstrapTable>
         );
       }
       else if(layout == 'Grid')
@@ -311,7 +349,6 @@ class Assets extends Component {
                                   }}>
                                   <source src={`${KURRENTTV_BASE_URL}/proxy/0000/${item['id']}.mp4`} type="video/webm"/>
                                 </Video>
-                               {/*<i style={{ position:'absolute' ,top:'50%' ,left:'50%' ,fontSize:'50px' ,margin:'-25px 0 0 -20px'}} className="fa fa-play-circle"></i>*/}
                               </div>
                               <Link to={`/asset/${item['id']}`}><h5>{this.subTitleFormat(item['title'])}</h5></Link>
                                 {this.assetStatusFlag(item['status'])}
@@ -360,51 +397,65 @@ class Assets extends Component {
         <Row>
           <Col xs="12" className="mb-4">
             <Nav tabs>
-              {map(assetViews, (view) => (<NavItem key={view.title}>
+              {map(assetViews, (view) => view.title !== '-' ? (<NavItem key={view.title}>
                   <NavLink
                     className={classnames({ active: this.state.activeTab === view.title })}
                     onClick={() => { this.toggle(view.title); }}
                   >
                     {view.title}
                   </NavLink>
-                </NavItem>)
+                </NavItem>) : null
               )}
             </Nav>
             <TabContent activeTab={this.state.activeTab}>
               {map(assetViews, (view) => {
-                return (<TabPane key={view.title} tabId={view.title}>
-                  <Row>
-                    <Col sm="4" className="d-none d-sm-inline-block">
-                      <ButtonToolbar className="float-left" aria-label="Toolbar with button groups">
-                        <ButtonGroup className="mr-3" aria-label="First group">
-                          <Button onClick={() => { this.showLayout('List'); }} active={layout === 'List'} color="outline-secondary"><i className="fa fa-th-list"></i></Button>
-                          <Button onClick={() => { this.showLayout('Grid'); }} active={layout === 'Grid'} color="outline-secondary"><i className="fa fa-th-large"></i></Button>
-                          <Button onClick={() => { this.showOptions(true); }} color="outline-secondary"><i className="fa fa-cog"></i></Button>
-                        </ButtonGroup>
-                      </ButtonToolbar>
-                    </Col>
-                    <Col sm="4" className="d-none d-sm-inline-block">
-                      <Link to="/asset/add"><Button color="primary" className="float-left"><i className="fa fa-plus"></i> Add New Asset</Button></Link>
-                    </Col>
-                    <Col md="4">
-                      <FormGroup className="float-right">
-                        <InputGroup>
-                          <InputGroupAddon addonType="prepend">
-                            <Button type="button" color="btn btn-outline-dark btn-block" onClick={this.applySearch}><i className="fa fa-search"></i></Button>
-                          </InputGroupAddon>
-                          <Input type="text" id="input3-group2" name="input3-group2" placeholder="Search" value={search} onChange={this.changeSearch} />
-                          <InputGroupAddon addonType="append">
-                            <Button type="button" color="btn btn-outline-dark btn-block" onClick={this.resetSearch}><i className="fa fa-times"></i></Button>
-                          </InputGroupAddon>
-                        </InputGroup>
-                      </FormGroup>
-                    </Col>
-                    <Col md="4">
-                      {formItems}
-                    </Col>
-                  </Row>
-                  {_tableData}
-                </TabPane>)
+                if (view.title !== '-') {
+                  return (<TabPane key={view.title} tabId={view.title}>
+                    <Row>
+                      <Col sm="4" className="d-none d-sm-inline-block">
+                        <ButtonToolbar className="float-left" aria-label="Toolbar with button groups">
+                          <ButtonGroup className="mr-3" aria-label="First group">
+                            <Button onClick={() => {
+                              this.showLayout('List');
+                            }} active={layout === 'List'} color="outline-secondary"><i
+                              className="fa fa-th-list"></i></Button>
+                            <Button onClick={() => {
+                              this.showLayout('Grid');
+                            }} active={layout === 'Grid'} color="outline-secondary"><i
+                              className="fa fa-th-large"></i></Button>
+                            <Button onClick={() => {
+                              this.showOptions(true);
+                            }} color="outline-secondary"><i className="fa fa-cog"></i></Button>
+                          </ButtonGroup>
+                        </ButtonToolbar>
+                      </Col>
+                      <Col sm="4" className="d-none d-sm-inline-block">
+                        <Link to="/asset/add"><Button color="primary" className="float-left"><i
+                          className="fa fa-plus"></i> Add New Asset</Button></Link>
+                      </Col>
+                      <Col md="4">
+                        <FormGroup className="float-right">
+                          <InputGroup>
+                            <InputGroupAddon addonType="prepend">
+                              <Button type="button" color="btn btn-outline-dark btn-block" onClick={this.applySearch}><i
+                                className="fa fa-search"></i></Button>
+                            </InputGroupAddon>
+                            <Input type="text" id="input3-group2" name="input3-group2" placeholder="Search"
+                                   value={search} onChange={this.changeSearch}/>
+                            <InputGroupAddon addonType="append">
+                              <Button type="button" color="btn btn-outline-dark btn-block" onClick={this.resetSearch}><i
+                                className="fa fa-times"></i></Button>
+                            </InputGroupAddon>
+                          </InputGroup>
+                        </FormGroup>
+                      </Col>
+                      <Col md="4">
+                        {formItems}
+                      </Col>
+                    </Row>
+                    {_tableData}
+                  </TabPane>)
+                }
               })}
             </TabContent>
           </Col>
